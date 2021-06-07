@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Главная страница
+{% endblock %}
+
+{% block nav %}
+<div class="container" align="right">
+        <form class="container-fluid justify-content-start">
+            <a href="{% url 'login_url' %}"><button class="btn btn-outline-success me-2" type="button">Войти</button></a>
+            <a href="{% url 'registration_url' %}"><button class="btn btn-sm btn-outline-secondary" type="button">Регистрация</button></a>
+        </form>
+    </div>
+{% endblock %}
