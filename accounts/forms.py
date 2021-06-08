@@ -52,6 +52,12 @@ class RegistrationForm(forms.ModelForm):
         model = User
         fields = ['email', 'password', 'confirm_password']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['email'].label = 'Почта'
+        self.fields['password'].label = 'Пароль'
+        self.fields['confirm_password'].label = 'Подтвердить пароль'
+
 
     def clean_email(self):
         email = self.cleaned_data['email']

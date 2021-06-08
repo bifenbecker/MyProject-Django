@@ -21,8 +21,9 @@ class RegistrationPageView(View):
         if form.is_valid():
             new_user = form.save(commit=False)
             new_user.email = form.cleaned_data['email']
-            new_user.set_password(form.cleaned_data['password'])
             new_user.username = form.cleaned_data['email'].split("@")[0]
+            new_user.save()
+            new_user.set_password(form.cleaned_data['password'])
             new_user.save()
             return redirect('profile_url', new_user.id)
         return render(request, self.template_name, context={'form': form})
@@ -53,7 +54,7 @@ class ProfilePageView(View):
 
     def get(self, request, id):
         user = User.objects.get(id=id)
-        if request.user.is_authenticated:
+        if user.is_authenticated:
             return render(request, 'accounts/profile.html', context={'user':user})
         else:
             return redirect('login_url')
