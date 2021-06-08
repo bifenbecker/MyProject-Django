@@ -1,51 +1,52 @@
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from django.views import View
+from django.contrib.auth.views import LoginView
 from django.contrib.auth import authenticate, login, logout
-from .forms import UserForm
+
+from .forms import *
 from django.contrib.auth.models import User
 
 class RegistrationPageView(View):
+    template_name = 'accounts/registration.html'
 
-    def get(self, request):
-        model_form = UserForm()
-        # model_form.fields['username'].label = 'логин'
-        return render(request, 'accounts/registration.html', context={'form': model_form})
+    def get(self, request, *args, **kwargs):
+        form = RegistrationForm(request.POST or None)
+        context = {'form': form}
+        return render(request, self.template_name, context)
 
-    def post(self, request):
-        model_form = UserForm(request.POST)
-        context = {'form': model_form}
-        if model_form.is_valid():
-            model_form.save()
-            return redirect('login_url')
-        else:
-            context['error'] = "Неверная форма"
-        return render(request, 'accounts/registration.html', context)
+    def post(self,request):
+        form = RegistrationForm(request.POST or None)
+
+        if form.is_valid():
+            new_user = form.save(commit=False)
+            new_user.email = form.cleaned_data['email']
+            new_user.set_password(form.cleaned_data['password'])
+            new_user.username = form.cleaned_data['email'].split("@")[0]
+            new_user.save()
+            return redirect('profile_url', new_user.id)
+        return render(request, self.template_name, context={'form': form})
 
 
 class LoginPageView(View):
+    template_name = 'accounts/login.html'
 
-    def get(self, request):
-        model_form = UserForm()
-        return render(request, 'accounts/login.html', context={'form':model_form})
+    def get(self, request, *args, **kwargs):
+        form = LoginForm(request.POST or None)
+        context = {'form': form}
+        return render(request, self.template_name, context)
 
-
-    def post(self, request):
-        model_form = UserForm(request.POST)
-
-        context = {'form': model_form }
-        if model_form.is_valid():
-            context['error'] = "Такого пользователя не существует"
-        else:
-            user = authenticate(request,
-                                username=request.POST.get('username'),
-                                email=request.POST.get('email'),
-                                password=request.POST.get('password'))
-
-            if user is not None:
+    def post(self, request, *args, **kwargs):
+        form = LoginForm(request.POST or None)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            username = email.split("@")[0]
+            user = authenticate(username=username, email=email, password=password)
+            if user:
                 login(request, user)
                 return redirect('profile_url', user.id)
-
-        return render(request, 'accounts/login.html', context=context)
+        return render(request, self.template_name, context={'form': form})
 
 
 class ProfilePageView(View):
