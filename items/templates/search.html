@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Pila.Ru - Товары
+{% endblock %}
+
+{% block custom_head %}
+
+    <!-- Custom styles for this page -->
+    <link href="/static/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+    <!-- Page Heading -->
+    <h1 class="h3 mb-2 text-gray-800">Товары</h1>
+    <p class="mb-4">Здесь представлены все товары от наших поставщиков. Для поиска введите слово в строке выше "Поиск товара..."</p>
+
+    <!-- DataTales Example -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                    <tr>
+                        <th>Название</th>
+                        <th>Категория</th>
+                        <th>Поставщик</th>
+                        <th>Ед. измерения</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tfoot>
+                    <tr>
+                        <th>Название</th>
+                        <th>Категория</th>
+                        <th>Поставщик</th>
+                        <th>Ед. измерения</th>
+                        <th></th>
+                    </tr>
+                    </tfoot>
+                    <tbody>
+                    {% for item in items %}
+                        <tr>
+                            <td>{{ item.name }}</td>
+                            <td>{{ item.category }}</td>
+                            <td>{{ item.supplier }}</td>
+                            <td>{{ item.unit_measurement }}</td>
+                            <td><button class="btn p-0"><i class="fas fa-cart-plus"></i></button></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block custom_script %}
+
+    <!-- Page level plugins -->
+    <script src="/static/vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="/static/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#dataTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Russian.json",
+                }
+            });
+        });
+    </script>
+
+    <!-- /.container-fluid -->
+{% endblock %}

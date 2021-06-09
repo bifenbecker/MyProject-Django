@@ -1,9 +1,13 @@
 from django.contrib import admin
 from django.urls import path, include
-from .views import *
+
+
+handler404 = 'home.views.handle_404_view'
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',index, name='index'),
-    path('accounts/', include('accounts.urls'), name='accounts_url'),
+    path('', include('home.urls')),
+    path('accounts/', include('accounts.urls')),
+    path('items/', include('items.urls')),
 ]

@@ -117,3 +117,6 @@ GitHub.sublime-settings
 
 #idea
 .idea
+
+static/admin
+static/rest_framework

@@ -1,9 +1,8 @@
 from django.urls import path, include
-from .views import *
+import accounts.views as views
 
 urlpatterns = [
-    path('registration/', RegistrationPageView.as_view(), name='registration_url'),
-    path('login/', LoginPageView.as_view(), name='login_url'),
-    path('profile/<id>/', ProfilePageView.as_view(), name='profile_url'),
-    path('logout/', LogoutPageView.as_view(), name='logout_url')
+    path('registration/', views.RegistrationPageView.as_view(), name='registration_url'),
+    path('login/', views.LoginPageView.as_view(), name='login_url'),
+    path('logout/', views.LogoutPageView.as_view(), name='logout_url')
 ]
