@@ -1,0 +1,434 @@
+[2021-06-09 22:08:18 +0000] [18550] [INFO] Starting gunicorn 19.9.0
+[2021-06-09 22:08:18 +0000] [18550] [INFO] Listening at: unix:/run/pilaru.sock (18550)
+[2021-06-09 22:08:18 +0000] [18550] [INFO] Using worker: gevent
+[2021-06-09 22:08:18 +0000] [18562] [INFO] Booting worker with pid: 18562
+[2021-06-09 22:08:18 +0000] [18563] [INFO] Booting worker with pid: 18563
+[2021-06-09 22:08:18 +0000] [18565] [INFO] Booting worker with pid: 18565
+[2021-06-09 22:08:18 +0000] [18562] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/ggevent.py", line 203, in init_process
+    super(GeventWorker, self).init_process()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/base.py", line 129, in init_process
+    self.load_wsgi()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/base.py", line 138, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 52, in load
+    return self.load_wsgiapp()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 41, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/util.py", line 350, in import_app
+    __import__(module)
+ModuleNotFoundError: No module named 'pilaru'
+[2021-06-09 22:08:18 +0000] [18562] [INFO] Worker exiting (pid: 18562)
+[2021-06-09 22:08:18 +0000] [18563] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/ggevent.py", line 203, in init_process
+    super(GeventWorker, self).init_process()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/base.py", line 129, in init_process
+    self.load_wsgi()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/base.py", line 138, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 52, in load
+    return self.load_wsgiapp()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 41, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/util.py", line 350, in import_app
+    __import__(module)
+ModuleNotFoundError: No module named 'pilaru'
+[2021-06-09 22:08:18 +0000] [18563] [INFO] Worker exiting (pid: 18563)
+[2021-06-09 22:08:18 +0000] [18565] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/ggevent.py", line 203, in init_process
+    super(GeventWorker, self).init_process()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/base.py", line 129, in init_process
+    self.load_wsgi()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/base.py", line 138, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 52, in load
+    return self.load_wsgiapp()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 41, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/util.py", line 350, in import_app
+    __import__(module)
+ModuleNotFoundError: No module named 'pilaru'
+[2021-06-09 22:08:18 +0000] [18565] [INFO] Worker exiting (pid: 18565)
+[2021-06-09 22:08:19 +0000] [18550] [INFO] Shutting down: Master
+[2021-06-09 22:08:19 +0000] [18550] [INFO] Reason: Worker failed to boot.
+[2021-06-09 22:08:19 +0000] [18572] [INFO] Starting gunicorn 19.9.0
+[2021-06-09 22:08:19 +0000] [18572] [INFO] Listening at: unix:/run/pilaru.sock (18572)
+[2021-06-09 22:08:19 +0000] [18572] [INFO] Using worker: gevent
+[2021-06-09 22:08:19 +0000] [18577] [INFO] Booting worker with pid: 18577
+[2021-06-09 22:08:19 +0000] [18578] [INFO] Booting worker with pid: 18578
+[2021-06-09 22:08:19 +0000] [18577] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/ggevent.py", line 203, in init_process
+    super(GeventWorker, self).init_process()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/base.py", line 129, in init_process
+    self.load_wsgi()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/base.py", line 138, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 52, in load
+    return self.load_wsgiapp()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 41, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/util.py", line 350, in import_app
+    __import__(module)
+ModuleNotFoundError: No module named 'pilaru'
+[2021-06-09 22:08:19 +0000] [18577] [INFO] Worker exiting (pid: 18577)
+[2021-06-09 22:08:19 +0000] [18579] [INFO] Booting worker with pid: 18579
+[2021-06-09 22:08:20 +0000] [18578] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/ggevent.py", line 203, in init_process
+    super(GeventWorker, self).init_process()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/base.py", line 129, in init_process
+    self.load_wsgi()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/base.py", line 138, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 52, in load
+    return self.load_wsgiapp()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 41, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/util.py", line 350, in import_app
+    __import__(module)
+ModuleNotFoundError: No module named 'pilaru'
+[2021-06-09 22:08:20 +0000] [18578] [INFO] Worker exiting (pid: 18578)
+[2021-06-09 22:08:20 +0000] [18579] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/ggevent.py", line 203, in init_process
+    super(GeventWorker, self).init_process()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/base.py", line 129, in init_process
+    self.load_wsgi()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/base.py", line 138, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 52, in load
+    return self.load_wsgiapp()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 41, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/util.py", line 350, in import_app
+    __import__(module)
+ModuleNotFoundError: No module named 'pilaru'
+[2021-06-09 22:08:20 +0000] [18579] [INFO] Worker exiting (pid: 18579)
+Traceback (most recent call last):
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 210, in run
+    self.sleep()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 360, in sleep
+    ready = select.select([self.PIPE[0]], [], [], 1.0)
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 245, in handle_chld
+    self.reap_workers()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 525, in reap_workers
+    raise HaltServer(reason, self.WORKER_BOOT_ERROR)
+gunicorn.errors.HaltServer: <HaltServer 'Worker failed to boot.' 3>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/babushka/tgbotsvenv/bin/gunicorn", line 10, in <module>
+    sys.exit(run())
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 61, in run
+    WSGIApplication("%(prog)s [OPTIONS] [APP_MODULE]").run()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/base.py", line 223, in run
+    super(Application, self).run()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/base.py", line 72, in run
+    Arbiter(self).run()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 232, in run
+    self.halt(reason=inst.reason, exit_status=inst.exit_status)
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 345, in halt
+    self.stop()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 393, in stop
+    time.sleep(0.1)
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 245, in handle_chld
+    self.reap_workers()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 525, in reap_workers
+    raise HaltServer(reason, self.WORKER_BOOT_ERROR)
+gunicorn.errors.HaltServer: <HaltServer 'Worker failed to boot.' 3>
+[2021-06-09 22:08:21 +0000] [18580] [INFO] Starting gunicorn 19.9.0
+[2021-06-09 22:08:21 +0000] [18580] [INFO] Listening at: unix:/run/pilaru.sock (18580)
+[2021-06-09 22:08:21 +0000] [18580] [INFO] Using worker: gevent
+[2021-06-09 22:08:21 +0000] [18583] [INFO] Booting worker with pid: 18583
+[2021-06-09 22:08:21 +0000] [18584] [INFO] Booting worker with pid: 18584
+[2021-06-09 22:08:21 +0000] [18583] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/ggevent.py", line 203, in init_process
+    super(GeventWorker, self).init_process()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/base.py", line 129, in init_process
+    self.load_wsgi()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/base.py", line 138, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 52, in load
+    return self.load_wsgiapp()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 41, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/util.py", line 350, in import_app
+    __import__(module)
+ModuleNotFoundError: No module named 'pilaru'
+[2021-06-09 22:08:21 +0000] [18583] [INFO] Worker exiting (pid: 18583)
+[2021-06-09 22:08:21 +0000] [18584] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/ggevent.py", line 203, in init_process
+    super(GeventWorker, self).init_process()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/base.py", line 129, in init_process
+    self.load_wsgi()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/base.py", line 138, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 52, in load
+    return self.load_wsgiapp()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 41, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/util.py", line 350, in import_app
+    __import__(module)
+ModuleNotFoundError: No module named 'pilaru'
+[2021-06-09 22:08:21 +0000] [18584] [INFO] Worker exiting (pid: 18584)
+Traceback (most recent call last):
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 203, in run
+    self.manage_workers()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 545, in manage_workers
+    self.spawn_workers()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 617, in spawn_workers
+    time.sleep(0.1 * random.random())
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 245, in handle_chld
+    self.reap_workers()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 525, in reap_workers
+    raise HaltServer(reason, self.WORKER_BOOT_ERROR)
+gunicorn.errors.HaltServer: <HaltServer 'Worker failed to boot.' 3>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/babushka/tgbotsvenv/bin/gunicorn", line 10, in <module>
+    sys.exit(run())
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 61, in run
+    WSGIApplication("%(prog)s [OPTIONS] [APP_MODULE]").run()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/base.py", line 223, in run
+    super(Application, self).run()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/base.py", line 72, in run
+    Arbiter(self).run()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 232, in run
+    self.halt(reason=inst.reason, exit_status=inst.exit_status)
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 345, in halt
+    self.stop()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 393, in stop
+    time.sleep(0.1)
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 245, in handle_chld
+    self.reap_workers()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 525, in reap_workers
+    raise HaltServer(reason, self.WORKER_BOOT_ERROR)
+gunicorn.errors.HaltServer: <HaltServer 'Worker failed to boot.' 3>
+[2021-06-09 22:08:24 +0000] [18587] [INFO] Starting gunicorn 19.9.0
+[2021-06-09 22:08:24 +0000] [18587] [INFO] Listening at: unix:/run/pilaru.sock (18587)
+[2021-06-09 22:08:24 +0000] [18587] [INFO] Using worker: gevent
+[2021-06-09 22:08:24 +0000] [18590] [INFO] Booting worker with pid: 18590
+[2021-06-09 22:08:24 +0000] [18591] [INFO] Booting worker with pid: 18591
+[2021-06-09 22:08:24 +0000] [18590] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/ggevent.py", line 203, in init_process
+    super(GeventWorker, self).init_process()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/base.py", line 129, in init_process
+    self.load_wsgi()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/base.py", line 138, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 52, in load
+    return self.load_wsgiapp()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 41, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/util.py", line 350, in import_app
+    __import__(module)
+ModuleNotFoundError: No module named 'pilaru'
+[2021-06-09 22:08:24 +0000] [18590] [INFO] Worker exiting (pid: 18590)
+[2021-06-09 22:08:24 +0000] [18591] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/ggevent.py", line 203, in init_process
+    super(GeventWorker, self).init_process()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/base.py", line 129, in init_process
+    self.load_wsgi()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/base.py", line 138, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 52, in load
+    return self.load_wsgiapp()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 41, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/util.py", line 350, in import_app
+    __import__(module)
+ModuleNotFoundError: No module named 'pilaru'
+[2021-06-09 22:08:24 +0000] [18591] [INFO] Worker exiting (pid: 18591)
+Traceback (most recent call last):
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 203, in run
+    self.manage_workers()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 545, in manage_workers
+    self.spawn_workers()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 617, in spawn_workers
+    time.sleep(0.1 * random.random())
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 245, in handle_chld
+    self.reap_workers()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 525, in reap_workers
+    raise HaltServer(reason, self.WORKER_BOOT_ERROR)
+gunicorn.errors.HaltServer: <HaltServer 'Worker failed to boot.' 3>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/babushka/tgbotsvenv/bin/gunicorn", line 10, in <module>
+    sys.exit(run())
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 61, in run
+    WSGIApplication("%(prog)s [OPTIONS] [APP_MODULE]").run()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/base.py", line 223, in run
+    super(Application, self).run()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/base.py", line 72, in run
+    Arbiter(self).run()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 232, in run
+    self.halt(reason=inst.reason, exit_status=inst.exit_status)
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 345, in halt
+    self.stop()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 393, in stop
+    time.sleep(0.1)
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 245, in handle_chld
+    self.reap_workers()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 525, in reap_workers
+    raise HaltServer(reason, self.WORKER_BOOT_ERROR)
+gunicorn.errors.HaltServer: <HaltServer 'Worker failed to boot.' 3>
+[2021-06-09 22:08:27 +0000] [18593] [INFO] Starting gunicorn 19.9.0
+[2021-06-09 22:08:27 +0000] [18593] [INFO] Listening at: unix:/run/pilaru.sock (18593)
+[2021-06-09 22:08:27 +0000] [18593] [INFO] Using worker: gevent
+[2021-06-09 22:08:27 +0000] [18596] [INFO] Booting worker with pid: 18596
+[2021-06-09 22:08:27 +0000] [18597] [INFO] Booting worker with pid: 18597
+[2021-06-09 22:08:27 +0000] [18596] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/ggevent.py", line 203, in init_process
+    super(GeventWorker, self).init_process()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/base.py", line 129, in init_process
+    self.load_wsgi()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/base.py", line 138, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 52, in load
+    return self.load_wsgiapp()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 41, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/util.py", line 350, in import_app
+    __import__(module)
+ModuleNotFoundError: No module named 'pilaru'
+[2021-06-09 22:08:27 +0000] [18596] [INFO] Worker exiting (pid: 18596)
+[2021-06-09 22:08:27 +0000] [18597] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/ggevent.py", line 203, in init_process
+    super(GeventWorker, self).init_process()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/base.py", line 129, in init_process
+    self.load_wsgi()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/base.py", line 138, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 52, in load
+    return self.load_wsgiapp()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 41, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/util.py", line 350, in import_app
+    __import__(module)
+ModuleNotFoundError: No module named 'pilaru'
+[2021-06-09 22:08:27 +0000] [18597] [INFO] Worker exiting (pid: 18597)
+[2021-06-09 22:08:27 +0000] [18600] [INFO] Booting worker with pid: 18600
+[2021-06-09 22:08:27 +0000] [18600] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 583, in spawn_worker
+    worker.init_process()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/ggevent.py", line 203, in init_process
+    super(GeventWorker, self).init_process()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/base.py", line 129, in init_process
+    self.load_wsgi()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/workers/base.py", line 138, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/base.py", line 67, in wsgi
+    self.callable = self.load()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 52, in load
+    return self.load_wsgiapp()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 41, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/util.py", line 350, in import_app
+    __import__(module)
+ModuleNotFoundError: No module named 'pilaru'
+[2021-06-09 22:08:27 +0000] [18600] [INFO] Worker exiting (pid: 18600)
+Traceback (most recent call last):
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 210, in run
+    self.sleep()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 360, in sleep
+    ready = select.select([self.PIPE[0]], [], [], 1.0)
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 245, in handle_chld
+    self.reap_workers()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 525, in reap_workers
+    raise HaltServer(reason, self.WORKER_BOOT_ERROR)
+gunicorn.errors.HaltServer: <HaltServer 'Worker failed to boot.' 3>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/babushka/tgbotsvenv/bin/gunicorn", line 10, in <module>
+    sys.exit(run())
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/wsgiapp.py", line 61, in run
+    WSGIApplication("%(prog)s [OPTIONS] [APP_MODULE]").run()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/base.py", line 223, in run
+    super(Application, self).run()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/app/base.py", line 72, in run
+    Arbiter(self).run()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 232, in run
+    self.halt(reason=inst.reason, exit_status=inst.exit_status)
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 345, in halt
+    self.stop()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 393, in stop
+    time.sleep(0.1)
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 245, in handle_chld
+    self.reap_workers()
+  File "/home/babushka/tgbotsvenv/lib/python3.6/site-packages/gunicorn/arbiter.py", line 525, in reap_workers
+    raise HaltServer(reason, self.WORKER_BOOT_ERROR)
+gunicorn.errors.HaltServer: <HaltServer 'Worker failed to boot.' 3>
+[2021-06-09 22:10:19 +0000] [18819] [INFO] Starting gunicorn 19.9.0
+[2021-06-09 22:10:19 +0000] [18819] [INFO] Listening at: unix:/run/pilaru.sock (18819)
+[2021-06-09 22:10:19 +0000] [18819] [INFO] Using worker: gevent
+[2021-06-09 22:10:19 +0000] [18830] [INFO] Booting worker with pid: 18830
+[2021-06-09 22:10:19 +0000] [18832] [INFO] Booting worker with pid: 18832
+[2021-06-09 22:10:19 +0000] [18835] [INFO] Booting worker with pid: 18835
+Not Found: /pilaru/
+ - - [10/Jun/2021:01:11:07 +0300] "GET /pilaru/ HTTP/1.0" 404 2505 "-" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.77 Safari/537.36"
