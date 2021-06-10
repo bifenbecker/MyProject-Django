@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block title %}
     Pila.Ru - Товары
 {% endblock %}
@@ -7,7 +9,7 @@
 {% block custom_head %}
 
     <!-- Custom styles for this page -->
-    <link href="/static/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="{% static '/vendor/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -46,7 +48,7 @@
                             <td>{{ item.category }}</td>
                             <td>{{ item.supplier }}</td>
                             <td>{{ item.unit_measurement }}</td>
-                            <td><button class="btn p-0"><i class="fas fa-cart-plus"></i></button></td>
+                            <td><button><i class="fas fa-cart-plus"></i></button></td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -60,8 +62,8 @@
 {% block custom_script %}
 
     <!-- Page level plugins -->
-    <script src="/static/vendor/datatables/jquery.dataTables.min.js"></script>
-    <script src="/static/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+    <script src="{% static '/vendor/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static '/vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
     <script>
         $(document).ready(function() {
             $('#dataTable').DataTable({
