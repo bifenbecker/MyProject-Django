@@ -28,6 +28,19 @@ class ItemCategory(models.Model):
         verbose_name_plural = 'Категории'
 
 
+class Product(models.Model):
+    name = models.CharField(max_length=255, verbose_name="Название продукта")
+    category = models.ForeignKey(ItemCategory, verbose_name="Категория продукта", on_delete=models.CASCADE)
+    supplier = models.ForeignKey(Supplier, verbose_name="Поставщик", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Продукт'
+        verbose_name_plural = 'Продукты'
+
+
 class Item(models.Model):
     UNIT_MEASUREMENT_CHOICES = (
         (0, 'Часов'),
@@ -46,8 +59,9 @@ class Item(models.Model):
         (13, 'Бух'),
     )
     name = models.CharField(max_length=200, verbose_name="Название")
-    supplier = models.ForeignKey(Supplier, on_delete=models.PROTECT, related_name="items", verbose_name="Поставщик")
-    category = models.ForeignKey(ItemCategory, on_delete=models.PROTECT, related_name="items", verbose_name="Категория")
+    # supplier = models.ForeignKey(Supplier, on_delete=models.PROTECT, verbose_name="Поставщик")
+    product = models.ForeignKey(Product, verbose_name="Продукт", related_name='items', default=None, on_delete=models.CASCADE)
+    # category = models.ForeignKey(ItemCategory, on_delete=models.PROTECT, related_name="items", verbose_name="Категория")
     unit_measurement = models.PositiveSmallIntegerField(choices=UNIT_MEASUREMENT_CHOICES, verbose_name='Единица измерения')
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
 
