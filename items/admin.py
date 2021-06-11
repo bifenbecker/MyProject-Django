@@ -16,7 +16,7 @@ class SupplierAdmin(admin.ModelAdmin):
 class ItemCategoryAdmin(admin.ModelAdmin):
     list_display = ["name", 'parent', "created_date"]
     list_filter = ["created_date", 'parent']
-    readonly_fields = ("created_date", )
+    readonly_fields = ("created_date", "slug")
     search_fields = ["name"]
     date_hierarchy = "created_date"
     ordering = ["-created_date"]
@@ -32,10 +32,11 @@ class ItemAdmin(admin.ModelAdmin):
 
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ["name", "category", "supplier"]
-    list_filter = ['category', 'supplier']
-    search_fields = ["name", 'supplier', 'category']
-
+    list_display = ["name", "category", "created_date"]
+    list_filter = ["category", "created_date"]
+    search_fields = ["name", 'category']
+    date_hierarchy = "created_date"
+    ordering = ["-created_date"]
 
 
 admin.site.register(Supplier, SupplierAdmin)

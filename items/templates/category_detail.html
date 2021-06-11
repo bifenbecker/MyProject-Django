@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Pila.Ru - {{ category.name }}
+{% endblock %}
+
+{% block custom_head %}
+<style>
+    li {
+        list-style-type: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+ <h1>Продукты - {{ category.name }}</h1>
+    <div class="list-wrap">
+        {% for product in products %}
+            <li>{{ product.name }}</li>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block custom_script %}
+{% endblock %}

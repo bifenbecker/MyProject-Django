@@ -1,6 +1,11 @@
 from django.db import models
+from django.utils.text import slugify
+from time import time
 
-# Create your models here.
+
+def gen_slug(s):
+    slug = slugify(s, allow_unicode=True) + '-' + str(int(time()))
+    return slug
 
 
 class Supplier(models.Model):
@@ -19,9 +24,14 @@ class ItemCategory(models.Model):
     name = models.CharField(max_length=200, verbose_name="Название")
     parent = models.ForeignKey('self', on_delete=models.PROTECT, blank=True, null=True, related_name="child", verbose_name="Родительская категория")
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    slug = models.SlugField(max_length=200, unique=True, default=None)
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name, allow_unicode=True)
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Категория'
@@ -31,7 +41,7 @@ class ItemCategory(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length=255, verbose_name="Название продукта")
     category = models.ForeignKey(ItemCategory, verbose_name="Категория продукта", on_delete=models.CASCADE)
-    supplier = models.ForeignKey(Supplier, verbose_name="Поставщик", on_delete=models.CASCADE)
+    created_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
 
     def __str__(self):
         return self.name
@@ -58,15 +68,19 @@ class Item(models.Model):
         (12, 'Рулоны'),
         (13, 'Бух'),
     )
+    slug = models.SlugField(max_length=200, unique=True, default=None)
     name = models.CharField(max_length=200, verbose_name="Название")
-    # supplier = models.ForeignKey(Supplier, on_delete=models.PROTECT, verbose_name="Поставщик")
-    product = models.ForeignKey(Product, verbose_name="Продукт", related_name='items', default=None, on_delete=models.CASCADE)
-    # category = models.ForeignKey(ItemCategory, on_delete=models.PROTECT, related_name="items", verbose_name="Категория")
+    supplier = models.ForeignKey(Supplier, verbose_name="Поставщик",related_name='suplliers', on_delete=models.PROTECT)
+    product = models.ForeignKey(Product, verbose_name="Продукт", related_name='products', default=None, on_delete=models.CASCADE)
     unit_measurement = models.PositiveSmallIntegerField(choices=UNIT_MEASUREMENT_CHOICES, verbose_name='Единица измерения')
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = gen_slug(self.name)
+        super(Item, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Товар'
