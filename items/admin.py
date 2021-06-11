@@ -25,7 +25,7 @@ class ItemCategoryAdmin(admin.ModelAdmin):
 class ItemAdmin(admin.ModelAdmin):
     list_display = ["name", "product", 'created_date']
     list_filter = ['product', "created_date"]
-    readonly_fields = ("created_date", )
+    readonly_fields = ("created_date", "slug")
     search_fields = ["name"]
     date_hierarchy = "created_date"
     ordering = ["-created_date"]

@@ -1,9 +1,14 @@
-from django.shortcuts import render
-from .models import Item, Product, Supplier, ItemCategory
+from .models import *
+from .serializer import ItemSerializer
+
 from django.views import View
-from .models import ItemCategory
+from django.shortcuts import render
 from django.template.defaulttags import register
 from django.shortcuts import get_object_or_404
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+
 
 
 def search_view(request):
@@ -42,3 +47,18 @@ class CategoriesDetailView(View):
         category = get_object_or_404(ItemCategory, slug=slug)
         products = Product.objects.filter(category=category)
         return render(request, self.tamplate_name,context={'category': category, 'products': products})
+
+
+class GetItemAPI(APIView):
+
+    def post(self, request):
+        data = request.data
+        try:
+            categories = ItemCategory.objects.filter(name__iexact=data['category'])
+            print(categories)
+            return Response({'Response': categories})
+        except:
+            return Response({'Response': 'Не найдено'})
+
+
+
