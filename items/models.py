@@ -71,7 +71,7 @@ class Item(models.Model):
     slug = models.SlugField(max_length=200, unique=True, default=None)
     name = models.CharField(max_length=200, verbose_name="Название")
     supplier = models.ForeignKey(Supplier, verbose_name="Поставщик",related_name='suplliers', on_delete=models.PROTECT)
-    product = models.ForeignKey(Product, verbose_name="Продукт", related_name='products', default=None, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, verbose_name="Продукт", related_name='items', default=None, on_delete=models.CASCADE)
     unit_measurement = models.PositiveSmallIntegerField(choices=UNIT_MEASUREMENT_CHOICES, verbose_name='Единица измерения')
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
 

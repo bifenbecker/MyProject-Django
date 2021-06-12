@@ -1,8 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
-# Create your models here.
-
 
 class PriceOffer(models.Model):
     item = models.ForeignKey('items.Item', on_delete=models.CASCADE, related_name="price_offers", verbose_name="К товару")
@@ -19,7 +17,7 @@ class PriceOffer(models.Model):
 
 
 class Order(models.Model):
-    created_by = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='orders', verbose_name='Создатель')
+    created_by = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='orders', verbose_name='Создатель')
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
 
     class Meta:

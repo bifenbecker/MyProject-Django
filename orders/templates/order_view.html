@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Pila.Ru - Заказы
+{% endblock %}
+
+{% block content %}
+<h1>Активные заказы</h1>
+
+<ul>
+    {% for order in order_list %}
+        <li>{{ order }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

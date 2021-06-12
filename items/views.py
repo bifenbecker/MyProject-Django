@@ -1,5 +1,5 @@
 from .models import *
-from .serializer import ItemSerializer
+from .serializer import ProductSerializer
 
 from django.views import View
 from django.shortcuts import render
@@ -9,6 +9,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
+import django.contrib.postgres.search
 
 
 def search_view(request):
@@ -49,16 +50,26 @@ class CategoriesDetailView(View):
         return render(request, self.tamplate_name,context={'category': category, 'products': products})
 
 
-class GetItemAPI(APIView):
+class SearchItemsAPI(APIView):
 
     def post(self, request):
-        data = request.data
-        try:
-            categories = ItemCategory.objects.filter(name__iexact=data['category'])
-            print(categories)
-            return Response({'Response': categories})
-        except:
-            return Response({'Response': 'Не найдено'})
 
+        data = request.data
+        categories = ItemCategory.objects.filter(parent=not None, name__icontains=data['category'])
+        products = []
+
+        for category in categories:
+            add_products = Product.objects.filter(category=category, name__icontains=data['search'])
+
+            if add_products.exists():
+                products += add_products
+
+        products_serializer = []
+        for product in products:
+            product_serializer = ProductSerializer(product)
+            products_serializer.append(product_serializer.data)
+
+
+        return Response({'Result': products_serializer})
 
 
