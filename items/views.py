@@ -50,26 +50,56 @@ class CategoriesDetailView(View):
         return render(request, self.tamplate_name,context={'category': category, 'products': products})
 
 
+# region API View
 class SearchItemsAPI(APIView):
 
     def post(self, request):
+        """
+        sort: - По какому полю Product сортировать (name, category, created_date, -name, -category, -created_date)
+        category: Категория, где искать
+        search: Текст поиска
+        """
 
         data = request.data
-        categories = ItemCategory.objects.filter(parent=not None, name__icontains=data['category'])
-        products = []
+        sort_by = data['sort']
+        search_category = data['category']
+        search_product = data['search']
 
-        for category in categories:
-            add_products = Product.objects.filter(category=category, name__icontains=data['search'])
+        try:
+            try:
+                categories = ItemCategory.objects.filter(slug__icontains=search_category)
 
-            if add_products.exists():
-                products += add_products
+                if not categories.exists():
+                    raise Exception(f"Категория {search_category} не найдена")
+            except:
+                raise Exception(f"Категория {search_category} не найдена")
 
-        products_serializer = []
-        for product in products:
-            product_serializer = ProductSerializer(product)
-            products_serializer.append(product_serializer.data)
+            products = Product.objects.none()
 
+            for category in categories:
+                print(category.parent)
+                add_products = Product.objects.filter(category=category, name__icontains=search_product)
 
-        return Response({'Result': products_serializer})
+                if add_products.exists():
+                    products |= add_products
+
+            if not products.exists():
+                raise Exception(f"Продукт {search_product} не найден")
+
+            try:
+                products = products.order_by(sort_by)
+            except:
+                raise Exception(f"Сортировать по {sort_by} невозомжно")
+
+            products_serializer = []
+            for product in products:
+                product_serializer = ProductSerializer(product)
+                products_serializer.append(product_serializer.data)
+
+            return Response({'Result': products_serializer})
+        except Exception as e:
+            return Response({'Result': str(e)})
+
+# endregion
 
 
