@@ -8,19 +8,17 @@ from rest_framework.views import APIView
 from items.models import Item
 from .models import Order, ItemToOrder
 
-
-# region Views
 from .serializer import ItemToOrderSerializer
 
 
-# TODO View only active order
+# region Views
 class OrderView(View):
     template_name = 'order_view.html'
 
     def get(self, request, *args, **kwargs):
-        order_list = request.user.orders.all()
+        active_order = request.user.active_order
 
-        return render(request, self.template_name, context={'order_list': order_list})
+        return render(request, self.template_name, context={'active_order': active_order})
 
 
 # TODO Create order history
@@ -28,8 +26,9 @@ class HistoryOrderView(View):
     template_name = 'history_order_view.html'
 
     def get(self, request, *args, **kwargs):
+        order_list_by_date = Order.objects.all().order_by('created_date')
 
-        return render(request, self.template_name)
+        return render(request, self.template_name, context={'order_list': order_list_by_date})
 # endregion
 
 
