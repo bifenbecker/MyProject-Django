@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block custom_head %}
+
+    <!-- Custom styles for this page -->
+    <link href="/static/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+    <input class="btn btn-link" type=button value="Назад" onClick="javascript:history.go(-1);">
+    <div class="row justify-content-center">
+        <div class="col-10">
+            <h4>{{ product.name }}</h4>
+            <p>Категория: {{ product.category }}</p>
+
+            <h5 class="mt-5">Предложения:</h5>
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                            <thead>
+                            <tr>
+                                <th>Название</th>
+                                <th>Поставщик</th>
+                                <th>Ед. измерения</th>
+                                <th>Дата добавления</th>
+                                <th>Кол-во</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for item in product.items.all %}
+                                <tr>
+                                    <td>{{ item.name }}</td>
+                                    <td>{{ item.supplier }}</td>
+                                    <td>{{ item.get_unit_measurement_display }}</td>
+                                    <td>{{ item.created_date }}</td>
+                                    <td><input class="form-control" type="number" name="item_qty" min="1" step="1" value="1"></td>
+                                    <td>
+                                        <button class="btn p-0" onclick="api_add_item_to_order(this, {{ item.id }})">
+                                            <span class="badged-cart-wrap fa-stack fa-2x has-badge" data-count="{{ item|get_items_qty_in_order:active_order }}">
+                                                <i class="badged-cart fas fa-cart-plus fa-stack-1x xfa-inverse fa-xs"></i>
+                                            </span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block custom_script %}
+
+    <!-- Page level plugins -->
+    <script src="/static/vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="/static/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#dataTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Russian.json",
+                },
+                "paging": false,
+                "searching": false
+            });
+        });
+    </script>
+
+    <!-- /.container-fluid -->
+{% endblock %}

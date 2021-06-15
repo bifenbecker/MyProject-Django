@@ -1,11 +1,5 @@
 {% extends 'base.html' %}
 
-{% load static %}
-
-{% block title %}
-    Pila.Ru - Товары
-{% endblock %}
-
 {% block custom_head %}
 
     <!-- Custom styles for this page -->
@@ -14,48 +8,62 @@
 
 {% block content %}
 
-    <!-- Page Heading -->
-    <h1 class="h3 mb-2 text-gray-800">Товары</h1>
-    <p class="mb-4">Здесь представлены все товары от наших поставщиков. Для поиска введите слово в строке выше "Поиск товара..."</p>
+        <div class="row">
+            <div class="col-2">
+                <ul class="list-inline">
+                    {% if current_category_name != "Категории" %}
 
-    <!-- DataTales Example -->
-    <div class="card shadow mb-4">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                    <thead>
-                    <tr>
-                        <th>Название</th>
-                        <th>Категория</th>
-                        <th>Поставщик</th>
-                        <th>Ед. измерения</th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                    <tfoot>
-                    <tr>
-                        <th>Название</th>
-                        <th>Категория</th>
-                        <th>Поставщик</th>
-                        <th>Ед. измерения</th>
-                        <th></th>
-                    </tr>
-                    </tfoot>
-                    <tbody>
-                    {% for item in items %}
-                        <tr>
-                            <td>{{ item.name }}</td>
-                            <td>{{ item.category }}</td>
-                            <td>{{ item.supplier }}</td>
-                            <td>{{ item.unit_measurement }}</td>
-                            <td><button><i class="fas fa-cart-plus"></i></button></td>
-                        </tr>
+                        <li class="list-inline-item"><a style="font-size: 14px;" href="{% url 'search_url' %}">Все категории</a> > </li>
+                        {% for category in parent_category_path %}
+                            <li class="list-inline-item"><a style="font-size: 14px;" href="{% url 'search_category_url' category.slug %}">{{ category.name }}</a> > </li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+                <h5 style="color: black; padding-top: 20px;">{{ current_category_name }}</h5>
+                <ul class="list-group list-group-flush">
+                    {% for category in child_categories %}
+                        <li class="list-group-item"><a href="{% url 'search_category_url' category.slug %}">{{ category.name }}</a></li>
                     {% endfor %}
-                    </tbody>
-                </table>
+                </ul>
+            </div>
+            <div class="col-10">
+                <div class="card shadow mb-4">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                <thead>
+                                <tr>
+                                    <th>Название</th>
+                                    <th>Категория</th>
+                                    <th>Поставщик</th>
+                                    <th>Ед. измерения</th>
+                                </tr>
+                                </thead>
+                                <tfoot>
+                                <tr>
+                                    <th>Название</th>
+                                    <th>Категория</th>
+                                    <th>Поставщик</th>
+                                    <th>Ед. измерения</th>
+                                </tr>
+                                </tfoot>
+                                <tbody>
+                                {% for product in products %}
+                                    <tr>
+                                        <td><a href="{% url 'product_details_url' product_id=product.id %}">{{ product.name }}</a></td>
+                                        <td>{{ product.category.name }}</td>
+                                        <td>{{ product.supplier }}</td>
+                                        <td>{{ product.unit_measurement }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+
 
 {% endblock %}
 

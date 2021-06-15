@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block custom_head %}
+
+    <!-- Custom styles for this page -->
+    <link href="/static/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+    <div class="row justify-content-center">
+        <div class="col-10">
+            <h5>Позиции в заказе номер {{ active_order.id }}:</h5>
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered w-100" id="dataTable" cellspacing="0">
+                            <thead>
+                            <tr>
+                                <th>Название</th>
+                                <th>Этап</th>
+                                <th>Поставщик</th>
+                                <th>Ед. измерения</th>
+                                <th>Кол-во</th>
+                                <th>Цена за единицу</th>
+                                <th>Сумма</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for item_to_order in active_order.items_in_order.all %}
+                                <tr>
+                                    <td>{{ item_to_order.item.name }}</td>
+                                    <td>{{ item_to_order.stage.name }}</td>
+                                    <td>{{ item_to_order.item.supplier.name }}</td>
+                                    <td>{{ item_to_order.item.get_unit_measurement_display }}</td>
+                                    <td><input class="form-control" type="number" name="item_qty" min="1" step="1" value="{{ item_to_order.quantity }}" onchange="api_change_item_qty_in_order(this, {{ item_to_order.id }})"></td>
+                                    <td>{% if item_to_order.price_offer %}{{ item_to_order.price_offer.price_per_unit|floatformat:2 }}{% else %}-{% endif %}</td>
+                                    <td>{% if item_to_order.get_total_price %}{{ item_to_order.get_total_price|floatformat:2 }}{% else %}-{% endif %}</td>
+                                    <td>
+                                        <button class="btn p-0" onclick="api_remove_item_from_order({{ item_to_order.id }})"><i class="fas fa-trash-alt fa-lg"></i></button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <a href="{% url 'search_url' %}" class="btn btn-outline-secondary float-right" onclick="api_close_order({{ active_order.id }})">Закрыть заказ</a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block custom_script %}
+
+    <!-- Page level plugins -->
+    <script src="/static/vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="/static/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#dataTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Russian.json",
+                },
+                "paging": false,
+                "searching": false
+            });
+        });
+    </script>
+
+    <!-- /.container-fluid -->
+{% endblock %}
