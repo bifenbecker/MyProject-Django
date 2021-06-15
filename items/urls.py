@@ -3,9 +3,9 @@ from .views import *
 
 
 urlpatterns = [
-    path('search/', search_view, name='search_url'),
-    path('categories/', CategoriesView.as_view(), name='categories_url'),
-    path('categories/<slug>', CategoriesDetailView.as_view(), name='category_url'),
-    path('api/search_items', SearchItemsAPI.as_view()),
+    path('search/', SearchView.as_view(), name='search_url'),
+    path('search/<slug>', SearchView.as_view(), name='search_category_url'),
+    path('view/<int:product_id>', ProductDetailsView.as_view(), name='product_details_url'),
+    # path('api/search_items', SearchItemsAPI.as_view()),
 
 ]

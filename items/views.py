@@ -1,53 +1,70 @@
-from .models import *
+from items.models import *
+from orders.models import Order, ItemToOrder
 from .serializer import ProductSerializer
 
-from django.views import View
-from django.shortcuts import render
+from django.views.generic.base import TemplateView
+from django.shortcuts import render, get_object_or_404
+from django.conf import settings
 from django.template.defaulttags import register
-from django.shortcuts import get_object_or_404
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-import django.contrib.postgres.search
-
-
-def search_view(request):
-    return render(request, "search.html", context={'items': Item.objects.all()})
-
 
 @register.filter
-def get_item(dictionary, key):
-    return dictionary.get(key)
+def get_items_qty_in_order(item: Item, order: Order):
+    item_to_order = ItemToOrder.objects.filter(item=item, order=order).first()
+    return item_to_order.quantity if item_to_order else 0
 
 
-class CategoriesView(View):
-    template_name = 'categories.html'
+class SearchView(TemplateView):
+    template_name = "search.html"
 
-    def get(self, request, *args, **kwargs):
-        data = {}
-        categories_db = ItemCategory.objects.all()
+    @classmethod
+    def _get_branch_categories(cls, category: ItemCategory):
+        yield category
+        if category.child.exists():
+            for next_child in category.child.all():
+                for child in cls._get_branch_categories(next_child):
+                    yield child
 
-        for cat_db in categories_db:
-            if cat_db.parent == None:
-                if cat_db.parent not in data.keys():
-                    data[cat_db.name] = []
+    @classmethod
+    def _get_parent_categories_path(cls, category: ItemCategory):
+        if category.parent:
+            for parent in cls._get_parent_categories_path(category.parent):
+                yield parent
+        yield category
 
-        for cat_db in categories_db:
-            if cat_db.parent != None:
-                data[cat_db.parent.name].append(cat_db)
-        context = {}
-        context['categories'] = data
-        return render(request, self.template_name, context=context)
+    def get_context_data(self, **kwargs):
+        slug = kwargs.get('slug', None)
+        products = Product.objects.all()
+        if slug:
+            search_category = get_object_or_404(ItemCategory, slug=slug)
+            products = products.filter(category__in=self._get_branch_categories(search_category))
+        else:
+            search_category = None
+
+        return {
+            'page_title': settings.PAGE_TITLE_PREFIX + 'Товары' + (' - ' + search_category.name if search_category else ''),
+            'toolbar_title': 'Категория: ' + search_category.name if search_category else 'Товары',
+            'products': products,
+            'current_category_name': search_category.name if search_category else 'Категории',
+            'child_categories': search_category.child.all() if search_category else ItemCategory.objects.filter(parent__isnull=True),
+            'parent_category_path': list(self._get_parent_categories_path(search_category))[:-1] if search_category else []
+        }
 
 
-class CategoriesDetailView(View):
-    tamplate_name = 'category_detail.html'
+class ProductDetailsView(TemplateView):
+    template_name = "product_details.html"
 
-    def get(self, request, slug, *args, **kwargs):
-        category = get_object_or_404(ItemCategory, slug=slug)
-        products = Product.objects.filter(category=category)
-        return render(request, self.tamplate_name,context={'category': category, 'products': products})
+    def get_context_data(self, **kwargs):
+        product = get_object_or_404(Product, id=kwargs['product_id'])
+        return {
+            'page_title': settings.PAGE_TITLE_PREFIX + product.name,
+            'toolbar_title': product.name,
+            'product': product,
+            'active_order': self.request.user.get_active_order()
+        }
 
 
 # region API View
@@ -99,7 +116,3 @@ class SearchItemsAPI(APIView):
             return Response({'Result': products_serializer})
         except Exception as e:
             return Response({'Result': str(e)})
-
-# endregion
-
-

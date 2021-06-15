@@ -1,11 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 from time import time
-
-
-def gen_slug(s):
-    slug = slugify(s, allow_unicode=True) + '-' + str(int(time()))
-    return slug
+import random
 
 
 class Supplier(models.Model):
@@ -26,11 +22,15 @@ class ItemCategory(models.Model):
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
     slug = models.SlugField(max_length=200, unique=True, default=None)
 
+    def _generate_slug(self):
+        parent_slug = self.parent._generate_slug() + '--' if self.parent else ''
+        return parent_slug + slugify(self.name, allow_unicode=True)
+
     def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.name, allow_unicode=True)
+        self.slug = self._generate_slug()
         super().save(*args, **kwargs)
 
     class Meta:
@@ -79,7 +79,7 @@ class Item(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        self.slug = gen_slug(self.name)
+        self.slug = slugify(self.name, allow_unicode=True) + '-' + str(int(time()) + random.random())
         super(Item, self).save(*args, **kwargs)
 
     class Meta:

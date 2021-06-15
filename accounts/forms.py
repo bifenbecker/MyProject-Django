@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate
 
 
@@ -49,12 +49,12 @@ class RegistrationForm(forms.ModelForm):
                                        widget=forms.PasswordInput(attrs={'class': 'form-control form-control-user', 'placeholder': 'Пароль (ещё раз)'}))
 
     class Meta:
-        model = User
+        model = get_user_model()
         fields = ['email', 'password', 'confirm_password']
 
     def clean_email(self):
         email = self.cleaned_data['email']
-        if User.objects.filter(email=email).exists():
+        if get_user_model().objects.filter(email=email).exists():
             raise forms.ValidationError(f"Аккаунт с таким адресом уже существует")
 
         return email

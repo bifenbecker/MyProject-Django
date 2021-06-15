@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block custom_head %}
+
+    <!-- Custom styles for this page -->
+    <link href="/static/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+    <div class="text-center">
+        <p class="lead text-gray-800 mb-5">У вас нет активного заказа :(</p>
+        <p class="text-gray-500 mb-0">Самое время выбрать пару позиций в каталоге</p>
+        <a href="{% url 'search_url' %}">&larr; Каталог товаров</a>
+    </div>
+{% endblock %}
+
+{% block custom_script %}
+
+    <!-- Page level plugins -->
+    <script src="/static/vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="/static/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#dataTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Russian.json",
+                },
+                "paging": false,
+                "searching": false
+            });
+        });
+    </script>
+
+    <!-- /.container-fluid -->
+{% endblock %}
