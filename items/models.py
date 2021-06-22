@@ -4,6 +4,24 @@ from time import time
 import random
 
 
+UNIT_MEASUREMENT_CHOICES = (
+    (0, 'Часов'),
+    (1, 'Дней'),
+    (2, 'Штуки'),
+    (3, 'Раз'),
+    (4, 'м'),
+    (5, 'м2'),
+    (6, 'м3'),
+    (7, 'Тонны'),
+    (8, 'Килограммы'),
+    (9, 'Копмлекты'),
+    (10, 'Коробки'),
+    (11, 'Упаковки'),
+    (12, 'Рулоны'),
+    (13, 'Бух'),
+)
+
+
 class Supplier(models.Model):
     name = models.CharField(max_length=200, verbose_name="Название")
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
@@ -41,6 +59,8 @@ class ItemCategory(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length=255, verbose_name="Название продукта")
     category = models.ForeignKey(ItemCategory, verbose_name="Категория продукта", on_delete=models.CASCADE)
+    unit_measurement = models.PositiveSmallIntegerField(choices=UNIT_MEASUREMENT_CHOICES, verbose_name='Единица измерения')
+    similar = models.ManyToManyField('self', symmetrical=True, verbose_name='Аналоги')
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
 
     def __str__(self):
@@ -52,22 +72,6 @@ class Product(models.Model):
 
 
 class Item(models.Model):
-    UNIT_MEASUREMENT_CHOICES = (
-        (0, 'Часов'),
-        (1, 'Дней'),
-        (2, 'Штуки'),
-        (3, 'Раз'),
-        (4, 'м'),
-        (5, 'м2'),
-        (6, 'м3'),
-        (7, 'Тонны'),
-        (8, 'Килограммы'),
-        (9, 'Копмлекты'),
-        (10, 'Коробки'),
-        (11, 'Упаковки'),
-        (12, 'Рулоны'),
-        (13, 'Бух'),
-    )
     slug = models.SlugField(max_length=200, unique=True, default=None)
     name = models.CharField(max_length=200, verbose_name="Название")
     supplier = models.ForeignKey(Supplier, verbose_name="Поставщик",related_name='suplliers', on_delete=models.PROTECT)

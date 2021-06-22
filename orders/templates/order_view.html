@@ -17,6 +17,7 @@
                         <table class="table table-bordered w-100" id="dataTable" cellspacing="0">
                             <thead>
                             <tr>
+                                <th>Номер</th>
                                 <th>Название</th>
                                 <th>Этап</th>
                                 <th>Поставщик</th>
@@ -30,6 +31,7 @@
                             <tbody>
                             {% for item_to_order in active_order.items_in_order.all %}
                                 <tr>
+                                    <td>{{ item_to_order.item.id }}</td>
                                     <td>{{ item_to_order.item.name }}</td>
                                     <td>{{ item_to_order.stage.name }}</td>
                                     <td>{{ item_to_order.item.supplier.name }}</td>

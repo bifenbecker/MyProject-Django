@@ -21,3 +21,20 @@
 .badged-cart{
     line-height: 2rem;
 }
+
+.tr-parent {
+    color: black;
+}
+.tr-child {
+    font-size: 14px;
+}
+.tr-child input {
+    font-size: 10px;
+}
+.tr-blank {
+    height: 10px !important; /* overwrites any other rules */
+    background-color: #FFFFFF;
+}
+.tr-blank td {
+    padding: 0;
+}

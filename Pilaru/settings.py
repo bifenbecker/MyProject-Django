@@ -23,9 +23,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-i(h0av4!oxe*w01@p*k0mf6@72swhaj@**+7*ngrkk2)=_+-ca'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+IS_LOCAL_DEV = True
 DEBUG = True
 
-ALLOWED_HOSTS = ['ssserver.cf']
+ALLOWED_HOSTS = ['127.0.0.1'] if IS_LOCAL_DEV else ['ssserver.cf']
 
 
 # Application definition
@@ -78,14 +79,20 @@ WSGI_APPLICATION = 'Pilaru.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+if IS_LOCAL_DEV:
+    DB_USER = 'admin'
+    DB_PASSWORD = 'admin'
+else:
+    DB_USER = 'pilaruadmin'
+    DB_PASSWORD = 'NRytubn6unmiM^'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'pilaru',
-        'USER':'pilaruadmin',
-        'PASSWORD':'NRytubn6unmiM^',
-        'HOST':'localhost',
-        'PORT':'',
+        'USER': DB_USER,
+        'PASSWORD': DB_PASSWORD,
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
 
@@ -127,7 +134,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/pilaru/static/'
-STATIC_ROOT = os.path.join('static')
+if IS_LOCAL_DEV:
+    STATIC_ROOT = ''
+    STATICFILES_DIRS = (os.path.join('static'), )
+else:
+    STATIC_ROOT = os.path.join('static')
 
 
 # Default primary key field type

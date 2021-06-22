@@ -56,7 +56,8 @@ class Command(BaseCommand):
 
             p = Product.objects.create(
                 name=row[1].strip(),
-                category=ic
+                category=ic,
+                unit_measurement=2
             )
 
             for supplier in suppliers:
