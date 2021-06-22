@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block custom_head %}
 
     <!-- Custom styles for this page -->
@@ -7,18 +9,18 @@
 {% endblock %}
 
 {% block content %}
+        <ul class="list-inline">
+            {% if current_category_name != "Категории" %}
 
+                <li class="list-inline-item"><a style="font-size: 14px;" href="{% url 'search_url' %}">Все категории</a> > </li>
+                {% for category in parent_category_path %}
+                    <li class="list-inline-item"><a style="font-size: 14px;" href="{% url 'search_category_url' category.slug %}">{{ category.name }}</a> > </li>
+                {% endfor %}
+            {% endif %}
+        </ul>
         <div class="row">
             <div class="col-2">
-                <ul class="list-inline">
-                    {% if current_category_name != "Категории" %}
 
-                        <li class="list-inline-item"><a style="font-size: 14px;" href="{% url 'search_url' %}">Все категории</a> > </li>
-                        {% for category in parent_category_path %}
-                            <li class="list-inline-item"><a style="font-size: 14px;" href="{% url 'search_category_url' category.slug %}">{{ category.name }}</a> > </li>
-                        {% endfor %}
-                    {% endif %}
-                </ul>
                 <h5 style="color: black; padding-top: 20px;">{{ current_category_name }}</h5>
                 <ul class="list-group list-group-flush">
                     {% for category in child_categories %}

@@ -14,7 +14,10 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
+
 const csrftoken = getCookie('csrftoken');
+const API_URL_PREFIX = '/pilaru';
 
 
 function api_add_item_to_order(btn, item_id) {
@@ -24,7 +27,7 @@ function api_add_item_to_order(btn, item_id) {
     let qty = parseInt($btn.parent().parent().find('input[name="item_qty"]')[0].value);
 
     $.ajax({
-        url: '/orders/api/add_item_to_order',
+        url: API_URL_PREFIX + '/orders/api/add_item_to_order',
         type: 'post',
         data: { 'item_id': item_id, 'quantity': qty },
         headers: {
@@ -47,7 +50,7 @@ function api_add_item_to_order(btn, item_id) {
 
 function api_remove_item_from_order(item_to_order_id) {
     $.ajax({
-        url: '/orders/api/remove_item_from_order',
+        url: API_URL_PREFIX + '/orders/api/remove_item_from_order',
         type: 'post',
         data: { 'item_to_order_id': item_to_order_id },
         headers: {
@@ -67,7 +70,7 @@ function api_remove_item_from_order(item_to_order_id) {
 function api_change_item_qty_in_order(input, item_to_order_id) {
     let quantity = input.value;
     $.ajax({
-        url: '/orders/api/change_item_qty_in_order',
+        url: API_URL_PREFIX + '/orders/api/change_item_qty_in_order',
         type: 'post',
         data: { 'item_to_order_id': item_to_order_id, 'quantity': quantity },
         headers: {
@@ -84,7 +87,7 @@ function api_change_item_qty_in_order(input, item_to_order_id) {
 
 function api_close_order(order_id) {
     $.ajax({
-        url: '/orders/api/close_order',
+        url: API_URL_PREFIX + '/orders/api/close_order',
         type: 'post',
         data: { 'order_id': order_id },
         headers: {
