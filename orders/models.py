@@ -39,7 +39,11 @@ class Order(models.Model):
         order_state_to_order = self.get_order_state()
         if order_state_to_order:
             order_state_to_order.finished_date = datetime.now()
+            order_state_to_order.save()
         OrderStateToOrder.objects.create(order=self, state=new_order_state)
+
+    def __str__(self):
+        return str(self.created_by)
 
     class Meta:
         verbose_name = 'Заказ'

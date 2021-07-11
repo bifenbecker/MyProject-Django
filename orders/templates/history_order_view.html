@@ -2,4 +2,13 @@
 
 {% block content %}
 <h1>История заказов</h1>
+{% if error %}
+<h4>{{ error }}</h4>
+{% else %}
+<ul>
+    {% for order in order_list %}
+        <a href="{% url 'history_order_detail_view_url' order_id=order.id %}">{{ order.created_date }} - {{ order.id }}</a><br>
+    {% endfor %}
+</ul>
+{% endif %}
 {% endblock %}

@@ -30,14 +30,38 @@ class OrderView(View):
             return render(request, 'order_view__no_active.html', context=context)
 
 
-# TODO Create order history
 class HistoryOrderView(View):
     template_name = 'history_order_view.html'
 
     def get(self, request, *args, **kwargs):
-        order_list_by_date = Order.objects.all().order_by('created_date')
+        try:
+            history_order_by_user = []
+            orders = Order.objects.filter(created_by=request.user)
+            _state = OrderState.objects.filter(name='Активный').first()
 
-        return render(request, self.template_name, context={'order_list': order_list_by_date})
+            for _order in orders:
+                _orders = OrderStateToOrder.objects.filter(state=_state, order=_order, finished_date__isnull=False)
+                if len(_orders) > 0:
+                    for o in _orders:
+                        history_order_by_user.append(o)
+
+            return render(request, self.template_name, context={'order_list': history_order_by_user})
+        except ObjectDoesNotExist:
+            return render(request, self.template_name, context={'error': "У Вас пока нет истории заказов :("})
+
+
+class HistoryOrderDetailView(View):
+    template_name = "order_view.html"
+
+    def get(self, request, *args, **kwargs):
+        order_id = kwargs['order_id']
+        context = {
+            'page_title': settings.PAGE_TITLE_PREFIX + 'Текущий заказ',
+            'toolbar_title': 'Текущий заказ'
+        }
+        order = OrderStateToOrder.objects.get(id=order_id)
+        context['active_order'] = Order.objects.get(id=order.order_id)
+        return render(request, self.template_name, context=context)
 # endregion
 
 
@@ -67,13 +91,14 @@ class AddToOrderAPIView(APIView):
 
             # Order
             order = user.get_active_order()
-
             # Create order if does not exists
             if order is None:
                 order = Order.objects.create(created_by=request.user)
-                OrderStateToOrder.objects.create(order=order, state=OrderState.objects.get(name='Активный'))
+                order_state = OrderState.objects.get(name='Активный')
+                OrderStateToOrder.objects.create(order=order, state=order_state)
 
             item_to_order = ItemToOrder.objects.filter(item=item, order=order).first()
+
             if item_to_order:
                 item_to_order.quantity += quantity
                 item_to_order.save()
