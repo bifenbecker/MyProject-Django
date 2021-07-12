@@ -151,28 +151,23 @@ border: none;
                 }
                 
             }
-
-            let ctx = document.getElementById("chart").getContext("2d");
-            let chart = new Chart(ctx, {
-            type: "bar",
-            data: {
-            labels: _labels,
-            datasets: [
-                {
-                label: "Цена (RUB)",
-                backgroundColor: "#79AEC8",
-                borderColor: "#417690",
-                data: _data
-                }
-            ]
-            },
-            options: {
-            title: {
-                text: "Цена",
-                display: true
-            }
-            }
-            });
+            const data = {
+                labels: _labels,
+                datasets: [{
+                    label: 'Цена',
+                    data: _data,
+                    fill: true,
+                    borderColor: 'rgb(0, 204, 0)',
+                    backgroundColor: 'rgb(0, 102, 255, 0.5)',
+                    tension: 0.1
+                }]
+            };
+            const config = {
+                type: 'line',
+                data: data,
+            };
+            let ctx = document.getElementById("chart");
+            let chart = new Chart(ctx, config);
         }
 
         $(document).ready(function() {
