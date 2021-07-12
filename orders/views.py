@@ -6,6 +6,7 @@ from django.conf import settings
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+
 from items.models import Item
 from .models import Order, Stage, ItemToOrder, OrderState, OrderStateToOrder, PriceOffer
 
@@ -25,6 +26,42 @@ class OrderView(View):
         active_order = request.user.get_active_order()
         if active_order:
             context['active_order'] = active_order
+
+            items_in_active_order = active_order.items_in_order.all()
+
+            history_order_by_user = []
+            orders = Order.objects.filter(created_by=request.user)
+            _state = OrderState.objects.filter(name='Активный').first()
+
+            for _order in orders:
+                _orders = OrderStateToOrder.objects.filter(state=_state, order=_order, finished_date__isnull=False)
+                if len(_orders) > 0:
+                    for o in _orders:
+                        history_order_by_user.append(o.order)
+
+            price_history = {}
+            for item in items_in_active_order:
+                data_item = {}
+                for _order in history_order_by_user:
+                    # Проверяем все заказы кроме активного
+                    if active_order != _order:
+                        date_of_item = str(_order.created_date).split(".")[0] # Какая именно дата нужна(OrderStateToOrder / Order)
+                        for item_in_order in list(_order.items_in_order.all()):
+                            # Ищем товар из активного заказа в товарах предыдущих заказов
+                            if item.item == item_in_order.item:
+                                try:
+                                    data_item[str(date_of_item)] = float(item.price_offer.price_per_unit)
+                                except:
+                                    data_item[str(date_of_item)] = None
+                                price_history[str(item.item)] = data_item
+                try:
+                    data_item[str(active_order.created_date).split(".")[0]] = float(item.price_offer.price_per_unit)
+                except:
+                    data_item[str(active_order.created_date).split(".")[0]] = None
+                price_history[str(item.item)] = data_item
+
+            print(price_history)
+            context['price_history'] = price_history
             return render(request, 'order_view.html', context=context)
         else:
             return render(request, 'order_view__no_active.html', context=context)
@@ -51,7 +88,7 @@ class HistoryOrderView(View):
 
 
 class HistoryOrderDetailView(View):
-    template_name = "order_view.html"
+    template_name = "history_order_detail_view.html"
 
     def get(self, request, *args, **kwargs):
         order_id = kwargs['order_id']
@@ -59,9 +96,18 @@ class HistoryOrderDetailView(View):
             'page_title': settings.PAGE_TITLE_PREFIX + 'Текущий заказ',
             'toolbar_title': 'Текущий заказ'
         }
-        order = OrderStateToOrder.objects.get(id=order_id)
-        context['active_order'] = Order.objects.get(id=order.order_id)
-        return render(request, self.template_name, context=context)
+        order_state_to_order = OrderStateToOrder.objects.get(id=order_id)
+        order = Order.objects.get(id=order_state_to_order.order_id)
+
+        if order.created_by == request.user:
+            context['active_order'] = order
+            return render(request, self.template_name, context=context)
+
+        # Protect order
+        # TODO: make error
+        # else:
+
+
 # endregion
 
 
