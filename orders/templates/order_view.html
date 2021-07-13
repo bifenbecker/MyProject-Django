@@ -96,7 +96,7 @@ border: none;
                                     <td>{{ item_to_order.item.supplier.name }}</td>
                                     <td>{{ item_to_order.item.get_unit_measurement_display }}</td>
                                     <td><input class="form-control" type="number" name="item_qty" min="1" step="1" value="{{ item_to_order.quantity }}" onchange="api_change_item_qty_in_order(this, {{ item_to_order.id }})"></td>
-                                    <td><span>{% if item_to_order.price_offer %}{{ item_to_order.price_offer.price_per_unit|floatformat:2 }}{% else %}-{% endif %}</span><span style="float: right"><button onclick="showGraph('{{ item_to_order.item.name }}')" class="btn btn-primary">График</button></span></td>
+                                    <td><span>{% if item_to_order.price_offer %}{{ item_to_order.price_offer.price_per_unit|floatformat:2 }}{% else %}-{% endif %}</span><span style="float: right"><button onclick="showGraph('{{ item_to_order.item.name }}', '{{ item_to_order.item.supplier.name }}')" class="btn btn-primary">График</button></span></td>
                                     <td>{% if item_to_order.get_total_price %}{{ item_to_order.get_total_price|floatformat:2 }}{% else %}-{% endif %}</td>
                                     <td>
                                         <button class="btn p-0" onclick="api_remove_item_from_order({{ item_to_order.id }})"><i class="fas fa-trash-alt fa-lg"></i></button>
@@ -114,6 +114,7 @@ border: none;
     <div id="show-graph">
         <window>
            <a href="#close_window" class="close_window">X</a>
+           
             <canvas id="chart" width="500" height="500"></canvas>
         </window>
     </div>
@@ -125,49 +126,51 @@ border: none;
     <script src="/static/vendor/datatables/jquery.dataTables.min.js"></script>
     <script src="/static/vendor/datatables/dataTables.bootstrap4.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4"></script>
+    <script src="/static/js/pilaru.js"></script>
     <script>
 
-        function showGraph(name){
-            location.hash ='show-graph'
-            var price_history_str = "{{ price_history }}".replace(/&#x27;/g,"\"").replace(/&quot;/g,"\"")
-            
-            var obj_str = price_history_str.substr(1, price_history_str.length - 3)
-            var objs = obj_str.split("}, ")
-
-            var _labels = []
-            var _data = []
-            for(var i = 0; i < objs.length; i++){
-                item_name = objs[i].split(": {")[0].replace(/^ '|^"|'$|"$/g,'')
-                
-                if(item_name == name){
-                    var b = objs[i].split(": {")[1].split(", ")
-                        for(var j = 0; j < b.length; j++){
-                            _labels.push(b[j].split(": ")[0].split(" ")[0].replace("\"",""))
-                            if(b[j].split(": ")[1] !== "None"){
-                                _data.push(b[j].split(": ")[1])
-                            }
-                    
-                        }
-                }
-                
-            }
+        function setGraph(obj){
+            console.log(Object.keys(obj['Data']));
+            console.log(Object.values(obj['Data']))
             const data = {
-                labels: _labels,
-                datasets: [{
-                    label: 'Цена',
-                    data: _data,
-                    fill: true,
-                    borderColor: 'rgb(0, 204, 0)',
-                    backgroundColor: 'rgb(0, 102, 255, 0.5)',
-                    tension: 0.1
-                }]
+                        labels: Object.keys(obj['Data']),
+                        datasets: [{
+                            label: 'Цена',
+                            data: Object.values(obj['Data']),
+                            fill: true,
+                            borderColor: 'rgb(0, 204, 0)',
+                            backgroundColor: 'rgb(0, 102, 255, 0.5)',
+                            tension: 0.1
+                        }]
             };
             const config = {
                 type: 'line',
                 data: data,
             };
-            let ctx = document.getElementById("chart");
-            let chart = new Chart(ctx, config);
+            var ctx = document.getElementById("chart");
+            var chart = new Chart(ctx, config);
+        }
+
+        function showGraph(item_name, supplier_name){
+            location.hash ='show-graph'
+
+            const csrftoken = getCookie('csrftoken');
+            
+            $.ajax({
+                url: '/orders/api/price_history',
+                type: 'post',
+                data: { 'name': item_name, 'supplier': supplier_name },
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                },
+                dataType: 'json',
+                success: function (obj) {
+                    setGraph(obj)
+                },
+                error: function (e) {
+                    alert('Ошибка запроса к серверу: ' + e.toString());
+                }
+            });    
         }
 
         $(document).ready(function() {

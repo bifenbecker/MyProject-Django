@@ -27,41 +27,6 @@ class OrderView(View):
         if active_order:
             context['active_order'] = active_order
 
-            items_in_active_order = active_order.items_in_order.all()
-
-            history_order_by_user = []
-            orders = Order.objects.filter(created_by=request.user)
-            _state = OrderState.objects.filter(name='Активный').first()
-
-            for _order in orders:
-                _orders = OrderStateToOrder.objects.filter(state=_state, order=_order, finished_date__isnull=False)
-                if len(_orders) > 0:
-                    for o in _orders:
-                        history_order_by_user.append(o.order)
-
-            price_history = {}
-            for item in items_in_active_order:
-                data_item = {}
-                for _order in history_order_by_user:
-                    # Проверяем все заказы кроме активного
-                    if active_order != _order:
-                        date_of_item = str(_order.created_date).split(".")[0] # Какая именно дата нужна(OrderStateToOrder / Order)
-                        for item_in_order in list(_order.items_in_order.all()):
-                            # Ищем товар из активного заказа в товарах предыдущих заказов
-                            if item.item == item_in_order.item:
-                                try:
-                                    data_item[str(date_of_item)] = float(item.price_offer.price_per_unit)
-                                except:
-                                    data_item[str(date_of_item)] = None
-                                price_history[str(item.item)] = data_item
-                try:
-                    data_item[str(active_order.created_date).split(".")[0]] = float(item.price_offer.price_per_unit)
-                except:
-                    data_item[str(active_order.created_date).split(".")[0]] = None
-                price_history[str(item.item)] = data_item
-
-            print(price_history)
-            context['price_history'] = price_history
             return render(request, 'order_view.html', context=context)
         else:
             return render(request, 'order_view__no_active.html', context=context)
@@ -155,13 +120,13 @@ class AddToOrderAPIView(APIView):
                     quantity=quantity,
                     stage=Stage.objects.all()[0]
                 )
-                if random.random() > 0.6:
-                    item_to_order.price_offer = PriceOffer.objects.get_or_create(
-                        item=item,
-                        for_quantity=random.randint(10, 50),
-                        price_per_unit=Decimal(random.randrange(1, 200, 1)),
-                    )[0]
-                    item_to_order.save()
+                item_to_order.price_offer = PriceOffer.objects.get_or_create(
+                    item=item,
+                    for_quantity=random.randint(10, 50),
+                    price_per_unit=Decimal(random.randrange(1, 200, 1)),
+                )[0]
+                item_to_order.save()
+
 
             return Response({'result': 'ok'})
         except Exception as e:
@@ -227,5 +192,27 @@ class CloseOrderAPIView(APIView):
         except Exception as e:
             print(e)
             return Response('error', status=500)
+
+
+class PriceHistoryOrderAPI(APIView):
+
+    def post(self, request):
+        data = request.data
+        item_name = data['name']
+        item_supplier = data['supplier']
+        orders = request.user.orders.all()
+
+        data_of_item = {}
+        for order in orders:
+            for item_in_order in order.items_in_order.all():
+                if item_in_order.item.supplier.name == item_supplier and item_in_order.item.name == item_name:
+                    date = str(item_in_order.created_date).split(".")[0]
+                    try:
+                        data_of_item[date] = float(item_in_order.price_offer.price_per_unit)
+                    except:
+                        data_of_item[date] = 0
+
+        return Response({'Result': 'ok', 'Data': data_of_item})
+
 
 # endregion
