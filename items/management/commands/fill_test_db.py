@@ -37,7 +37,7 @@ class Command(BaseCommand):
         suppliers_names = ('Сатурн', 'Планета электрика', 'Стройкомплект', 'Очаг', 'Магазин', 'Современные окна', 'Дострой', )
         suppliers = [Supplier.objects.get_or_create(name=name)[0] for name in suppliers_names]
 
-        for order_state_name in ('Активный', 'Закрыт', ):
+        for order_state_name in ('Активный', 'Завершен', 'Отменен'):
             OrderState.objects.create(name=order_state_name)
 
         for row in data:

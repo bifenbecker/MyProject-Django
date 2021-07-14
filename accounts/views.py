@@ -1,9 +1,11 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
-from django.views import View
+from django.views import View, generic
 from django.contrib.auth.views import LoginView
 from django.contrib.auth import authenticate, login, logout
 
 from .forms import LoginForm, RegistrationForm
+from .models import User
 
 
 class RegistrationPageView(View):
@@ -40,5 +42,19 @@ class LogoutPageView(View):
             return redirect('index_url')
         else:
             return redirect('login_url')
+
+
+# TODO: Need test with few profiles
+class ProfileView(LoginRequiredMixin, generic.DetailView):
+    model = User
+    template_name = 'profile.html'
+
+    def get_object(self):
+        return self.request.user
+
+    def dispatch(self, request, *args, **kwargs):
+        user = request.user
+        return render(request, self.template_name, context={"user": user})
+
 
 

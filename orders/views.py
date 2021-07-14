@@ -38,9 +38,8 @@ class HistoryOrderView(View):
     def get(self, request, *args, **kwargs):
         try:
             history_order_by_user = []
-            orders = Order.objects.filter(created_by=request.user)
             _state = OrderState.objects.filter(name='Активный').first()
-
+            orders = request.user.orders.all()
             for _order in orders:
                 _orders = OrderStateToOrder.objects.filter(state=_state, order=_order, finished_date__isnull=False)
                 if len(_orders) > 0:
@@ -186,7 +185,7 @@ class CloseOrderAPIView(APIView):
             except ObjectDoesNotExist:
                 raise Exception("Заказ не найден")
 
-            order.set_order_state(OrderState.objects.get(name='Закрыт'))
+            order.set_order_state(OrderState.objects.get(name='Отменен'))
 
             return Response({'result': 'ok'})
         except Exception as e:
