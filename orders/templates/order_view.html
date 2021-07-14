@@ -1,5 +1,6 @@
-{% extends 'base.html' %}
 
+{% extends 'base.html' %}
+{% load get_item %}
 {% block custom_head %}
 
     <!-- Custom styles for this page -->
@@ -85,6 +86,7 @@ border: none;
                                 <th>Кол-во</th>
                                 <th>Цена за единицу</th>
                                 <th>Сумма</th>
+                                <th>Последняя цена</th>
                                 <th></th>
                             </tr>
                             </thead>
@@ -98,6 +100,7 @@ border: none;
                                     <td><input class="form-control" type="number" name="item_qty" min="1" step="1" value="{{ item_to_order.quantity }}" onchange="api_change_item_qty_in_order(this, {{ item_to_order.id }})"></td>
                                     <td><span>{% if item_to_order.price_offer %}{{ item_to_order.price_offer.price_per_unit|floatformat:2 }}{% else %}-{% endif %}</span><span style="float: right"><button onclick="showGraph('{{ item_to_order.item.name }}', '{{ item_to_order.item.supplier.name }}')" class="btn btn-primary">График</button></span></td>
                                     <td>{% if item_to_order.get_total_price %}{{ item_to_order.get_total_price|floatformat:2 }}{% else %}-{% endif %}</td>
+                                    <td>{{ last_price|get_item:item_to_order.id }}</td>
                                     <td>
                                         <button class="btn p-0" onclick="api_remove_item_from_order({{ item_to_order.id }})"><i class="fas fa-trash-alt fa-lg"></i></button>
                                     </td>

@@ -14,6 +14,35 @@ import random
 from decimal import Decimal
 
 
+
+def get_history_order(orders):
+    try:
+        history_order_by_user = []
+        _state = OrderState.objects.filter(name='Активный').first()
+        for _order in orders:
+            _orders = OrderStateToOrder.objects.filter(state=_state, order=_order, finished_date__isnull=False)
+            if len(_orders) > 0:
+                for o in _orders:
+                    history_order_by_user.append(o)
+
+        if len(history_order_by_user) != 0:
+            return history_order_by_user
+        else:
+            raise ObjectDoesNotExist("У Вас пока нет истории заказов :(")
+    except ObjectDoesNotExist:
+        raise ObjectDoesNotExist("У Вас пока нет истории заказов :(")
+
+
+def find_last_item_price_in_orders(item: ItemToOrder, orders: list):
+    orders = orders[::-1]
+    for order in orders:
+        for item_in_order in order.order.items_in_order.all():
+            if item_in_order.item.supplier.name == item.item.supplier.name and item_in_order.item.name == item.item.name:
+                return float(item_in_order.price_offer.price_per_unit)
+
+    return 0.0
+
+
 # region Views
 class OrderView(View):
 
@@ -26,7 +55,18 @@ class OrderView(View):
         active_order = request.user.get_active_order()
         if active_order:
             context['active_order'] = active_order
+            orders = request.user.orders.all()
+            last_price = {}
+            try:
+                history_order_by_user = get_history_order(orders)
+                for item_in_active_order in active_order.items_in_order.all():
+                    last_price[item_in_active_order.id] = find_last_item_price_in_orders(item_in_active_order,
+                                                                                      history_order_by_user)
+            except ObjectDoesNotExist as e:
+                for item_in_active_order in active_order.items_in_order.all():
+                    last_price[item_in_active_order.id] = str(e)
 
+            context['last_price'] = last_price
             return render(request, 'order_view.html', context=context)
         else:
             return render(request, 'order_view__no_active.html', context=context)
@@ -37,18 +77,17 @@ class HistoryOrderView(View):
 
     def get(self, request, *args, **kwargs):
         try:
-            history_order_by_user = []
-            _state = OrderState.objects.filter(name='Активный').first()
             orders = request.user.orders.all()
-            for _order in orders:
-                _orders = OrderStateToOrder.objects.filter(state=_state, order=_order, finished_date__isnull=False)
-                if len(_orders) > 0:
-                    for o in _orders:
-                        history_order_by_user.append(o)
-
+            history_order_by_user = get_history_order(orders)
+            # _state = OrderState.objects.filter(name='Активный').first()
+            # for _order in orders:
+            #     _orders = OrderStateToOrder.objects.filter(state=_state, order=_order, finished_date__isnull=False)
+            #     if len(_orders) > 0:
+            #         for o in _orders:
+            #             history_order_by_user.append(o)
             return render(request, self.template_name, context={'order_list': history_order_by_user})
-        except ObjectDoesNotExist:
-            return render(request, self.template_name, context={'error': "У Вас пока нет истории заказов :("})
+        except ObjectDoesNotExist as e:
+            return render(request, self.template_name, context={'error': str(e)})
 
 
 class HistoryOrderDetailView(View):
@@ -56,14 +95,15 @@ class HistoryOrderDetailView(View):
 
     def get(self, request, *args, **kwargs):
         order_id = kwargs['order_id']
-        context = {
-            'page_title': settings.PAGE_TITLE_PREFIX + 'Текущий заказ',
-            'toolbar_title': 'Текущий заказ'
-        }
+
         order_state_to_order = OrderStateToOrder.objects.get(id=order_id)
         order = Order.objects.get(id=order_state_to_order.order_id)
 
         if order.created_by == request.user:
+            context = {
+                'page_title': settings.PAGE_TITLE_PREFIX + 'Заказ: ' + str(order.id),
+                'toolbar_title': 'Заказ: ' + str(order.id) + ' От ' + str(order.created_date).split(".")[0]
+            }
             context['active_order'] = order
             return render(request, self.template_name, context=context)
 

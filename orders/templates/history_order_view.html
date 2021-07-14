@@ -7,7 +7,7 @@
 {% else %}
 <ul>
     {% for order in order_list %}
-        <a href="{% url 'history_order_detail_view_url' order_id=order.id %}">{{ order.created_date }} - {{ order.id }}</a><br>
+        <a href="{% url 'history_order_detail_view_url' order_id=order.id %}">{{ order.created_date }} - {{ order.order_id }}</a><br>
     {% endfor %}
 </ul>
 {% endif %}
