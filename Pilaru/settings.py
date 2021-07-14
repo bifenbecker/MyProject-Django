@@ -70,6 +70,7 @@ TEMPLATES = [
             ],
             'libraries': {
                 'get_item': 'orders.templatetags.order_tags',
+                'index': 'orders.templatetags.order_tags',
 
             }
         },

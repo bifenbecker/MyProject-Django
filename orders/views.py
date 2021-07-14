@@ -33,12 +33,12 @@ def get_history_order(orders):
         raise ObjectDoesNotExist("У Вас пока нет истории заказов :(")
 
 
-def find_last_item_price_in_orders(item: ItemToOrder, orders: list):
+def find_last_item_price_and_supplier_in_orders(item: ItemToOrder, orders: list):
     orders = orders[::-1]
     for order in orders:
         for item_in_order in order.order.items_in_order.all():
             if item_in_order.item.supplier.name == item.item.supplier.name and item_in_order.item.name == item.item.name:
-                return float(item_in_order.price_offer.price_per_unit)
+                return (float(item_in_order.price_offer.price_per_unit), item_in_order.item.supplier.name)
 
     return 0.0
 
@@ -60,7 +60,7 @@ class OrderView(View):
             try:
                 history_order_by_user = get_history_order(orders)
                 for item_in_active_order in active_order.items_in_order.all():
-                    last_price[item_in_active_order.id] = find_last_item_price_in_orders(item_in_active_order,
+                    last_price[item_in_active_order.id] = find_last_item_price_and_supplier_in_orders(item_in_active_order,
                                                                                       history_order_by_user)
             except ObjectDoesNotExist as e:
                 for item_in_active_order in active_order.items_in_order.all():
