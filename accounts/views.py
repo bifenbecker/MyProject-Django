@@ -1,10 +1,12 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.views import View, generic
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, PasswordChangeView
 from django.contrib.auth import authenticate, login, logout
 
-from .forms import LoginForm, RegistrationForm
+
+from Pilaru import settings
+from .forms import LoginForm, RegistrationForm, PasswordChangeForm, UsernameChangeForm
 from .models import User
 
 
@@ -44,7 +46,6 @@ class LogoutPageView(View):
             return redirect('login_url')
 
 
-# TODO: Need test with few profiles
 class ProfileView(LoginRequiredMixin, generic.DetailView):
     model = User
     template_name = 'profile.html'
@@ -54,7 +55,59 @@ class ProfileView(LoginRequiredMixin, generic.DetailView):
 
     def dispatch(self, request, *args, **kwargs):
         user = request.user
-        return render(request, self.template_name, context={"user": user})
+        context = {
+            'page_title': settings.PAGE_TITLE_PREFIX + 'Профиль',
+            'toolbar_title': 'Профиль - ' + user.username,
+            'user': user
+        }
+        return render(request, self.template_name, context=context)
+
+
+class ProfilePasswordChangeView(View):
+    template_name = 'password_change_form.html'
+
+    context = {
+        'page_title': settings.PAGE_TITLE_PREFIX + 'Изменить пароль',
+        'toolbar_title': 'Изменить пароль',
+    }
+
+    def get(self, request, *args, **kwargs):
+        form = PasswordChangeForm(request.user, request.POST or None)
+        self.context.update({'form': form})
+        return render(request, self.template_name, context=self.context)
+
+    def post(self, request):
+        form = PasswordChangeForm(request.user, request.POST or None)
+        self.context.update({'form': form})
+        if form.is_valid():
+            request.user.set_password(form.cleaned_data['new_password'])
+            request.user.save()
+            return redirect('login_url')
+        return render(request, self.template_name, context=self.context)
+
+
+class ProfileUsernameChangeView(View):
+    template_name = 'username_change_form.html'
+
+    context = {
+        'page_title': settings.PAGE_TITLE_PREFIX + 'Изменить имя пользователя',
+        'toolbar_title': 'Изменить имя пользователя',
+    }
+
+    def get(self, request, *args, **kwargs):
+        form = UsernameChangeForm(request.user, request.POST or None)
+        self.context.update({'form': form})
+        return render(request, self.template_name, context=self.context)
+
+    def post(self, request):
+        form = UsernameChangeForm(request.user, request.POST or None)
+        self.context.update({'form': form})
+        if form.is_valid():
+            request.user.username = form.cleaned_data['new_username']
+            request.user.save()
+            return redirect('profile_url')
+        return render(request, self.template_name, context=self.context)
+
 
 
 

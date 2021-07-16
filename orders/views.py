@@ -64,9 +64,12 @@ class OrderView(View):
                                                                                       history_order_by_user)
             except ObjectDoesNotExist as e:
                 for item_in_active_order in active_order.items_in_order.all():
-                    last_price[item_in_active_order.id] = str(e)
+                    last_price[item_in_active_order.id] = (str(e), '')
 
             context['last_price'] = last_price
+
+            stages = Stage.objects.all()
+            context['stages'] = stages
             return render(request, 'order_view.html', context=context)
         else:
             return render(request, 'order_view__no_active.html', context=context)

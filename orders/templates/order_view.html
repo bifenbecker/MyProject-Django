@@ -95,7 +95,11 @@ border: none;
                             {% for item_to_order in active_order.items_in_order.all %}
                                 <tr>
                                     <td>{{ item_to_order.item.name }}</td>
-                                    <td>{{ item_to_order.stage.name }}</td>
+                                    <td><select name="" id="">
+                                        {% for stage in stages %}
+                                            <option value="">{{ stage.name }}</option>
+                                        {% endfor %}
+                                    </select></td>
                                     <td>{{ item_to_order.item.supplier.name }}</td>
                                     <td>{{ item_to_order.item.get_unit_measurement_display }}</td>
                                     <td><input class="form-control" type="number" name="item_qty" min="1" step="1" value="{{ item_to_order.quantity }}" onchange="api_change_item_qty_in_order(this, {{ item_to_order.id }})"></td>
