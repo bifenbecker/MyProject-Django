@@ -29,6 +29,7 @@ class OrderState(models.Model):
 
 
 class Order(models.Model):
+    project = models.ForeignKey('projects.Project', on_delete=models.CASCADE, related_name='orders_in_project', null=True)
     created_by = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='orders', verbose_name='Создатель')
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
 

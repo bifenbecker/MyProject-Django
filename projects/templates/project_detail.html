@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+
+
+{% block content %}
+<div><p>Создатель - {{ creator }}</p></div>
+
+<form action="" method="post">
+    {% csrf_token %}
+    <div style="float: right;">
+        <label for="">Сгенерировать ссылку для приглашения в проект</label>
+        <button class="btn btn-primary" type="submit">Сгенерировать</button>
+        <input type="text" readonly value="{{ invite_link.link }}">
+    </div>
+</form>
+
+
+<div>Участники:</div>
+{% for member in project.members.all %}
+    <li>
+        {{ member }}
+    </li>
+{% endfor %}
+{% endblock %}

@@ -6,6 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 
 
 from Pilaru import settings
+from projects.views import is_auth
 from .forms import LoginForm, RegistrationForm, PasswordChangeForm, UsernameChangeForm
 from .models import User
 
@@ -13,9 +14,11 @@ from .models import User
 class RegistrationPageView(View):
     template_name = 'registration.html'
 
+
     def get(self, request, *args, **kwargs):
         form = RegistrationForm(request.POST or None)
         return render(request, self.template_name, {'form': form})
+
 
     def post(self, request):
         form = RegistrationForm(request.POST or None)
@@ -53,6 +56,7 @@ class ProfileView(LoginRequiredMixin, generic.DetailView):
     def get_object(self):
         return self.request.user
 
+    @is_auth
     def dispatch(self, request, *args, **kwargs):
         user = request.user
         context = {
@@ -71,11 +75,13 @@ class ProfilePasswordChangeView(View):
         'toolbar_title': 'Изменить пароль',
     }
 
+    @is_auth
     def get(self, request, *args, **kwargs):
         form = PasswordChangeForm(request.user, request.POST or None)
         self.context.update({'form': form})
         return render(request, self.template_name, context=self.context)
 
+    @is_auth
     def post(self, request):
         form = PasswordChangeForm(request.user, request.POST or None)
         self.context.update({'form': form})
@@ -94,11 +100,13 @@ class ProfileUsernameChangeView(View):
         'toolbar_title': 'Изменить имя пользователя',
     }
 
+    @is_auth
     def get(self, request, *args, **kwargs):
         form = UsernameChangeForm(request.user, request.POST or None)
         self.context.update({'form': form})
         return render(request, self.template_name, context=self.context)
 
+    @is_auth
     def post(self, request):
         form = UsernameChangeForm(request.user, request.POST or None)
         self.context.update({'form': form})

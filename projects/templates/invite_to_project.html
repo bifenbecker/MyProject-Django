@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+
+
+{% block content %}
+{% if message %}
+<h1>{{ message }}</h1>
+{% else %}
+<h2>Вас пригласил {{ member_invite }} в проект - {{ project_name }}</h2>
+{% endif %}
+<form action="" method="post">
+    {% csrf_token %}
+    <button class="btn btn-secondary" type="submit">Присоедениться</button>
+</form>
+<br>
+<a href="{% url 'search_url' %}"><button class="btn btn-danger">Отказаться</button></a>
+{% endblock %}

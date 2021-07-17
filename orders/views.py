@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 
 
 from items.models import Item
+from projects.views import is_auth
 from .models import Order, Stage, ItemToOrder, OrderState, OrderStateToOrder, PriceOffer
 
 import random
@@ -46,82 +47,77 @@ def find_last_item_price_and_supplier_in_orders(item: ItemToOrder, orders: list)
 # region Views
 class OrderView(View):
 
+    @is_auth
     def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated():
-            context = {
-                'page_title': settings.PAGE_TITLE_PREFIX + 'Текущий заказ',
-                'toolbar_title': 'Текущий заказ'
-            }
+        context = {
+            'page_title': settings.PAGE_TITLE_PREFIX + 'Текущий заказ',
+            'toolbar_title': 'Текущий заказ'
+        }
 
-            active_order = request.user.get_active_order()
-            if active_order:
-                context['active_order'] = active_order
-                orders = request.user.orders.all()
-                last_price = {}
-                try:
-                    history_order_by_user = get_history_order(orders)
-                    for item_in_active_order in active_order.items_in_order.all():
-                        last_price[item_in_active_order.id] = find_last_item_price_and_supplier_in_orders(item_in_active_order,
-                                                                                          history_order_by_user)
-                except ObjectDoesNotExist as e:
-                    for item_in_active_order in active_order.items_in_order.all():
-                        last_price[item_in_active_order.id] = (str(e), '')
+        active_order = request.user.get_active_order()
+        if active_order:
+            context['active_order'] = active_order
+            orders = request.user.orders.all()
+            last_price = {}
+            try:
+                history_order_by_user = get_history_order(orders)
+                for item_in_active_order in active_order.items_in_order.all():
+                    last_price[item_in_active_order.id] = find_last_item_price_and_supplier_in_orders(
+                        item_in_active_order,
+                        history_order_by_user)
+            except ObjectDoesNotExist as e:
+                for item_in_active_order in active_order.items_in_order.all():
+                    last_price[item_in_active_order.id] = (str(e), '')
 
-                context['last_price'] = last_price
+            context['last_price'] = last_price
 
-                stages = Stage.objects.all()
-                context['stages'] = stages
-                return render(request, 'order_view.html', context=context)
-            else:
-                return render(request, 'order_view__no_active.html', context=context)
+            stages = Stage.objects.all()
+            context['stages'] = stages
+            return render(request, 'order_view.html', context=context)
         else:
-            return redirect('login_url')
+            return render(request, 'order_view__no_active.html', context=context)
 
 
 class HistoryOrderView(View):
     template_name = 'history_order_view.html'
 
+    @is_auth
     def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated():
-            try:
-                orders = request.user.orders.all()
-                history_order_by_user = get_history_order(orders)
-                # _state = OrderState.objects.filter(name='Активный').first()
-                # for _order in orders:
-                #     _orders = OrderStateToOrder.objects.filter(state=_state, order=_order, finished_date__isnull=False)
-                #     if len(_orders) > 0:
-                #         for o in _orders:
-                #             history_order_by_user.append(o)
-                return render(request, self.template_name, context={'order_list': history_order_by_user})
-            except ObjectDoesNotExist as e:
-                return render(request, self.template_name, context={'error': str(e)})
-        else:
-            return redirect('login_url')
+        context = {
+            'page_title': settings.PAGE_TITLE_PREFIX + 'Заказы',
+            'toolbar_title': 'История заказов',
+        }
+        try:
+            orders = request.user.orders.all()
+            history_order_by_user = get_history_order(orders)
+            context.update({'order_list': history_order_by_user})
+            return render(request, self.template_name, context=context)
+        except ObjectDoesNotExist as e:
+            context.update({'error': str(e)})
+            return render(request, self.template_name, context=context)
 
 
 class HistoryOrderDetailView(View):
     template_name = "history_order_detail_view.html"
 
+    @is_auth
     def get(self, request, *args, **kwargs):
-        if request.user.is_authenticated():
-            order_id = kwargs['order_id']
+        order_id = kwargs['order_id']
 
-            order_state_to_order = OrderStateToOrder.objects.get(id=order_id)
-            order = Order.objects.get(id=order_state_to_order.order_id)
+        order_state_to_order = OrderStateToOrder.objects.get(id=order_id)
+        order = Order.objects.get(id=order_state_to_order.order_id)
 
-            if order.created_by == request.user:
-                context = {
-                    'page_title': settings.PAGE_TITLE_PREFIX + 'Заказ: ' + str(order.id),
-                    'toolbar_title': 'Заказ: ' + str(order.id) + ' От ' + str(order.created_date).split(".")[0]
-                }
-                context['active_order'] = order
-                return render(request, self.template_name, context=context)
+        if order.created_by == request.user:
+            context = {
+                'page_title': settings.PAGE_TITLE_PREFIX + 'Заказ: ' + str(order.id),
+                'toolbar_title': 'Заказ: ' + str(order.id) + ' От ' + str(order.created_date).split(".")[0]
+            }
+            context['active_order'] = order
+            return render(request, self.template_name, context=context)
 
-            # Protect order
-            # TODO: make error
-            # else:
-        else:
-            redirect('login_url')
+        # Protect order
+        # TODO: make error
+        # else:
 
 
 # endregion
