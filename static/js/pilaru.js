@@ -32,11 +32,18 @@ function api_add_item_to_order(btn, item_id) {
         },
         dataType: 'json',
         success: function (data) {
-            let current_qty = parseInt($span.attr('data-count'));
-            if (isNaN(current_qty)) {
-                current_qty = 0;
+            if (data['result'] !== 'ok'){
+                alert(data['result'])
+            else if(data['error'] === 'Create'){
+                continue;
+            }else{
+                let current_qty = parseInt($span.attr('data-count'));
+                if (isNaN(current_qty)) {
+                    current_qty = 0;
+                }
+                $span.attr('data-count', current_qty + qty);
             }
-            $span.attr('data-count', current_qty + qty);
+
         },
         error: function (e) {
             alert('Ошибка запроса к серверу: ' + e.toString());
@@ -97,4 +104,43 @@ function api_close_order(order_id) {
         }
     });
 
+}
+
+function setActiveOrder(project_name, order_id){
+    $.ajax({
+        url: '/orders/api/set_active_order',
+        type: 'post',
+        data: { 'project_name': project_name, 'order_id': order_id },
+        headers: {
+            'X-CSRFToken': csrftoken,
+        },
+        dataType: 'json',
+        success: function (data) { 
+            var orders_a = Array.prototype.slice.call(document.getElementById('ActiveOrders').querySelectorAll('a'));
+            var active_order = orders_a.filter(filterElements)[0];
+            active_order.getElementsByClassName('badge badge-pill badge-success')[0].innerHTML = 'Не выбран';
+            active_order.getElementsByClassName('badge badge-pill badge-success')[0].className = 'badge badge-pill badge-secondary';
+            
+        },
+        error: function (e) {
+            alert('Ошибка запроса к серверу: ' + e['error']);
+        }
+    });
+}
+
+$(document).on('click', function(e) {
+    var target = e.target;
+    if(target.className === 'dropdown-item d-flex align-items-center' && target.onclick != null){
+        var div_status = target.getElementsByClassName('badge badge-pill badge-secondary');
+          
+        if(div_status.length != 0){
+            console.log(div_status[0].innerHTML);  
+            div_status[0].innerHTML = 'Активный';
+            div_status[0].className = 'badge badge-pill badge-success';
+        }
+    }
+});
+
+function filterElements(element){
+    return element.getElementsByClassName('badge badge-pill badge-success').length != 0;
 }

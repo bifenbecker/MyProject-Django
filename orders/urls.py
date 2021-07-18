@@ -11,4 +11,5 @@ urlpatterns = [
     path('api/change_item_qty_in_order', ChangeItemQuantityInOrderAPIView.as_view()),
     path('api/close_order', CloseOrderAPIView.as_view()),
     path('api/price_history', PriceHistoryOrderAPI.as_view()),
+    path('api/set_active_order', SetActiveOrderAPI.as_view()),
 ]

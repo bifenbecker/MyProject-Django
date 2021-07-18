@@ -59,11 +59,14 @@ class ProfileView(LoginRequiredMixin, generic.DetailView):
     @is_auth
     def dispatch(self, request, *args, **kwargs):
         user = request.user
+        active_project = user.get_active_project()
         context = {
             'page_title': settings.PAGE_TITLE_PREFIX + 'Профиль',
             'toolbar_title': 'Профиль - ' + user.username,
-            'user': user
+            'user': user,
+            'active_project': active_project if active_project else 'У Вас пока нет проектов :(',
         }
+
         return render(request, self.template_name, context=context)
 
 

@@ -65,7 +65,7 @@
             </a>
             <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
-                    <a class="collapse-item" href="{% url 'order_view_url' %}">Текущий заказ</a>
+                    <a class="collapse-item" href="{% url 'order_view_url' %}">Текущие заказы</a>
                     <a class="collapse-item" href="{% url 'history_order_view_url' %}">История заказов</a>
                 </div>
             </div>
@@ -182,6 +182,40 @@
                             </form>
                         </div>
                     </li>
+
+                    {% if user.is_authenticated %}
+                    <li class="nav-item dropdown no-arrow mx-1">
+                        <a class="nav-link dropdown-toggle" href="#" id="ordersDropdown" role="button"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-th-list"></i>
+                            <!-- Counter - Orders -->
+                            <span class="badge badge-danger badge-counter">{{ user.orders.all|length  }}</span>
+                        </a>
+                        <!-- Dropdown - Orders -->
+                        <div id="ActiveOrders" class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                             aria-labelledby="messagesDropdown">
+                            <h6 class="dropdown-header">
+                                Ваши заказы с проектов
+                            </h6>
+                            {% for member in user.member_in_projects.all %}
+                                {% if member.project.get_active_order %}
+                                    <a class="dropdown-item d-flex align-items-center" href="#" onclick="setActiveOrder('{{ member.project.name }}', {{ member.project.get_active_order.id }})">
+                                        <div class="font-weight-bold">
+                                            <div class="text-truncate">{{ member.project.name }}</div>
+                                            <div class="small text-gray-500">Заказ</div>
+                                            {% if user.active_order.id == member.project.get_active_order.id %}
+                                                <div class="badge badge-pill badge-success">Активный</div>
+                                            {% else %}
+                                                <div class="badge badge-pill badge-secondary">Не выбран</div>
+                                            {% endif %}
+
+                                        </div>
+                                    </a>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </li>
+                    {% endif %}
 
                     <!-- Nav Item - Alerts -->
                     <li class="nav-item dropdown no-arrow mx-1">

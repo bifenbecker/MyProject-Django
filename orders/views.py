@@ -8,7 +8,6 @@ from rest_framework.views import APIView
 
 
 from items.models import Item
-from projects.views import is_auth
 from .models import Order, Stage, ItemToOrder, OrderState, OrderStateToOrder, PriceOffer
 
 import random
@@ -44,33 +43,56 @@ def find_last_item_price_and_supplier_in_orders(item: ItemToOrder, orders: list)
     return 0.0
 
 
+def get_last_price_by_order(user, order):
+    last_price = {}
+    orders = user.orders.all()
+    try:
+        history_order_by_user = get_history_order(orders)
+        for item_in_active_order in order.items_in_order.all():
+            last_price[item_in_active_order.id] = find_last_item_price_and_supplier_in_orders(
+                item_in_active_order,
+                history_order_by_user)
+    except ObjectDoesNotExist as e:
+        for item_in_active_order in order.items_in_order.all():
+            last_price[item_in_active_order.id] = (str(e), '')
+
+    return last_price
+
+
+def is_auth(func):
+    """Check is authenticated user"""
+
+    def wrapper(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return func(self, request, *args, **kwargs)
+        else:
+            return redirect('login_url')
+    return wrapper
+
+
 # region Views
 class OrderView(View):
 
     @is_auth
     def get(self, request, *args, **kwargs):
         context = {
-            'page_title': settings.PAGE_TITLE_PREFIX + 'Текущий заказ',
-            'toolbar_title': 'Текущий заказ'
+            'page_title': settings.PAGE_TITLE_PREFIX + 'Текущие заказы',
+            'toolbar_title': 'Текущие заказы с проектов'
         }
 
-        active_order = request.user.get_active_order()
-        if active_order:
-            context['active_order'] = active_order
-            orders = request.user.orders.all()
-            last_price = {}
-            try:
-                history_order_by_user = get_history_order(orders)
-                for item_in_active_order in active_order.items_in_order.all():
-                    last_price[item_in_active_order.id] = find_last_item_price_and_supplier_in_orders(
-                        item_in_active_order,
-                        history_order_by_user)
-            except ObjectDoesNotExist as e:
-                for item_in_active_order in active_order.items_in_order.all():
-                    last_price[item_in_active_order.id] = (str(e), '')
+        active_orders_by_projects = []
+        for member in request.user.member_in_projects.all():
+            if member.project.get_active_order():
+                active_orders_by_projects.append(member.project.get_active_order())
 
-            context['last_price'] = last_price
+        last_price_orders = {}
+        if len(active_orders_by_projects) != 0:
+            for order in active_orders_by_projects:
+                last_price_orders.update({order.id: get_last_price_by_order(request.user, order)})
 
+        if len(active_orders_by_projects) != 0:
+            context['active_orders'] = active_orders_by_projects
+            context['last_price'] = last_price_orders
             stages = Stage.objects.all()
             context['stages'] = stages
             return render(request, 'order_view.html', context=context)
@@ -148,10 +170,19 @@ class AddToOrderAPIView(APIView):
                 raise Exception("Товар не найден")
 
             # Order
-            order = user.get_active_order()
+            order = user.active_order
             # Create order if does not exists
+            # TODO: Need to check on bugs
             if order is None:
-                order = Order.objects.create(created_by=request.user)
+                # if len(user.member_in_projects.all()) == 0:
+                #     redirect('create_project_url')
+                #     return Response({'error': 'Create'})
+
+                active_project = user.get_active_project()
+                if active_project is None:
+                    return Response({'result': 'Создайте или вступите в проект'})
+
+                order = Order.objects.create(created_by=request.user, project=active_project) # Автоматически добавлять товар в новый заказ в активном(последнем) проекте (Без выбора)
                 order_state = OrderState.objects.get(name='Активный')
                 OrderStateToOrder.objects.create(order=order, state=order_state)
 
@@ -177,7 +208,6 @@ class AddToOrderAPIView(APIView):
 
             return Response({'result': 'ok'})
         except Exception as e:
-            print(e)
             return Response('error', status=500)
 
 
@@ -262,4 +292,13 @@ class PriceHistoryOrderAPI(APIView):
         return Response({'Result': 'ok', 'Data': data_of_item})
 
 
+class SetActiveOrderAPI(APIView):
+
+    def post(self, request):
+        data = request.data
+        order = Order.objects.get(id=data['order_id'])
+        if order.project.name != data['project_name']:
+            return Response({'error': 'Неизвестная ошибка'})
+        request.user.set_active_order(order)
+        return Response({'Result': 'ok'})
 # endregion
