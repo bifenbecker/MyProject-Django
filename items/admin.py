@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django import forms
 from .models import Supplier, ItemCategory, Item, Product
 
 # Register your models here.
@@ -34,9 +35,9 @@ class ItemAdmin(admin.ModelAdmin):
 class ProductAdmin(admin.ModelAdmin):
     list_display = ["name", "category", "created_date"]
     list_filter = ["category", "created_date"]
-    search_fields = ["name", 'category']
+    search_fields = ["name", 'category__name']
     date_hierarchy = "created_date"
-    ordering = ["-created_date"]
+    ordering = ["name"]
 
 
 admin.site.register(Supplier, SupplierAdmin)

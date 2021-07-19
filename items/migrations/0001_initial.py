@@ -43,6 +43,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=255, verbose_name='Название продукта')),
+                ('unit_measurement', models.PositiveSmallIntegerField(choices=[(0, 'Часов'), (1, 'Дней'), (2, 'Штуки'), (3, 'Раз'), (4, 'м'), (5, 'м2'), (6, 'м3'), (7, 'Тонны'), (8, 'Килограммы'), (9, 'Копмлекты'), (10, 'Коробки'), (11, 'Упаковки'), (12, 'Рулоны'), (13, 'Бух')], verbose_name='Единица измерения')),
                 ('created_date', models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')),
                 ('category', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='items.itemcategory', verbose_name='Категория продукта')),
             ],

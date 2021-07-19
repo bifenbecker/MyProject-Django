@@ -60,7 +60,7 @@ class ProjectDetailView(View):
         creator = project.members.all().filter(access=0).first()
 
         context = {
-            'page_title': settings.PAGE_TITLE_PREFIX + 'Проект:' + str(project_id),
+            'page_title': settings.PAGE_TITLE_PREFIX + 'Проект:' + str(project.id),
             'toolbar_title': project.name,
             'project': project,
             'creator': creator,
@@ -73,8 +73,8 @@ class ProjectDetailView(View):
     def post(self, request, project_id):
         project = Project.objects.get(id=project_id)
         creator = project.members.all().filter(access=0).first()
-        project_member = request.user.member_in_projects.get(project=project)
 
+        project_member = request.user.member_in_projects.get(project=project)
         invite_link = InviteLinkToProject(member_invite=project_member, project=project)
         invite_link.save()
 
@@ -83,7 +83,9 @@ class ProjectDetailView(View):
             'toolbar_title': project.name,
             'project': project,
             'creator': creator,
-            'invite_link': invite_link.link,
+            'last_price': get_last_price_by_order(request.user, project.get_active_order()) if project.get_active_order() else None,
+            'stages': Stage.objects.all(),
+            'invite_link': invite_link,
         }
         return render(request, self.template_name, context=context)
 
