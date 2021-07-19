@@ -6,7 +6,7 @@
 {% if message %}
 <h1>{{ message }}</h1>
 {% else %}
-<h2>Вас пригласил {{ member_invite }} в проект - {{ project_name }}</h2>
+<h2>Вас пригласил {{ invite_link.member_invite }} в проект - {{ invite_link.project.name }}</h2>
 {% endif %}
 <form action="" method="post">
     {% csrf_token %}

@@ -1,9 +1,6 @@
-from urllib.parse import urlencode
-
 from django.db import models
-import random, time
-
-from django.utils.timezone import now
+from django.conf import settings
+import uuid
 
 
 class ProjectMember(models.Model):
@@ -27,43 +24,17 @@ class ProjectMember(models.Model):
 
 
 class InviteLinkToProject(models.Model):
+    link_key = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     member_invite = models.ForeignKey('ProjectMember', on_delete=models.CASCADE, related_name='invite_links', verbose_name='Приглашающий', default=None, null=True)
-    link = models.CharField(max_length=356, unique=True, verbose_name='Ссылка для приглашения в проект')
     created_date = models.DateTimeField(auto_now_add=True, verbose_name='Дата создания')
-    slug = models.CharField(max_length=50, unique=True, verbose_name='Slug')
     project = models.ForeignKey('Project', on_delete=models.CASCADE, verbose_name='Проект', related_name='invite_link', default=None, null=True)
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.generate_slug()
-        self.generate_link()
-
-
-    def generate_slug(self):
-        import time
-        id = self.project.id
-        time = int(time.time())
-        rand = int(random.random() * 1000)
-        try:
-            self.slug = str(id) + str(time) + str(rand)
-        except:
-            self.slug = str(id) + str(time) + str(rand + 1)
-
-    def generate_link(self):
-        # TODO: Need to change host
-        BASE = "localhost:8000/project/invite/?"
-        data = {
-            'member_invite_id': self.member_invite.id,
-            'member_invite': self.member_invite,
-            'project_name': self.project.name,
-            'project_id': self.project.id,
-            'slug': self.slug,
-        }
-        data_url_encode = urlencode(data)
-        self.link = BASE + data_url_encode
+    @property
+    def link(self):
+        return settings.URL_BASE + "/project/invite/" + str(self.link_key)
 
     def __str__(self):
-        return self.link
+        return self.link_key
 
 
 class Project(models.Model):
@@ -77,10 +48,7 @@ class Project(models.Model):
         return self.name
 
     def get_active_order(self):
-        if self.orders_in_project.all().last() is not None:
-            return self.orders_in_project.all().last()
-        else:
-            return None
+        return self.orders_in_project.all().last()
 
     class Meta:
         verbose_name = 'Проект'
