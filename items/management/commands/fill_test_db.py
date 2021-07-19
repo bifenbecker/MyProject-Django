@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.db.models.deletion import ProtectedError
 from items.models import Supplier, ItemCategory, Item, Product
-from orders.models import Stage, OrderState, OrderStateToOrder, Order, PriceOffer
+from orders.models import Stage, OrderState, OrderStateToOrder, Order, PriceOffer, ItemToOrder
 import random
 
 
@@ -9,6 +9,7 @@ class Command(BaseCommand):
     help = 'Fills database with test data'
 
     def handle(self, *args, **options):
+        ItemToOrder.objects.all().delete()
         Item.objects.all().delete()
         Supplier.objects.all().delete()
         Product.objects.all().delete()
@@ -36,7 +37,7 @@ class Command(BaseCommand):
         suppliers_names = ('Сатурн', 'Планета электрика', 'Стройкомплект', 'Очаг', 'Магазин', 'Современные окна', 'Дострой', )
         suppliers = [Supplier.objects.get_or_create(name=name)[0] for name in suppliers_names]
 
-        for order_state_name in ('Активный', 'Закрыт', ):
+        for order_state_name in ('Активный', 'Завершен', 'Отменен'):
             OrderState.objects.create(name=order_state_name)
 
         for row in data:

@@ -66,7 +66,7 @@
             </a>
             <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
-                    <a class="collapse-item" href="{% url 'order_view_url' %}">Текущий заказ</a>
+                    <a class="collapse-item" href="{% url 'order_view_url' %}">Текущие заказы</a>
                     <a class="collapse-item" href="{% url 'history_order_view_url' %}">История заказов</a>
                 </div>
             </div>
@@ -75,9 +75,15 @@
         <!-- Nav Item - Utilities Collapse Menu -->
 
         <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link" href="{% url 'profile_url' %}">
                 <i class="fas fa-fw fa-user"></i>
                 <span>Мой профиль</span></a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'create_project_url' %}">
+                <i class="fas fa-plus-circle"></i>
+                <span>Создать проект</span></a>
         </li>
 
         <!-- Divider -->
@@ -177,6 +183,40 @@
                             </form>
                         </div>
                     </li>
+
+                    {% if user.is_authenticated %}
+                    <li class="nav-item dropdown no-arrow mx-1">
+                        <a class="nav-link dropdown-toggle" href="#" id="ordersDropdown" role="button"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-th-list"></i>
+                            <!-- Counter - Orders -->
+                            <span class="badge badge-danger badge-counter">{{ user.member_in_projects.all|length  }}</span>
+                        </a>
+                        <!-- Dropdown - Orders -->
+                        <div id="ActiveOrders" class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                             aria-labelledby="messagesDropdown">
+                            <h6 class="dropdown-header">
+                                Ваши заказы с проектов
+                            </h6>
+                            {% for member in user.member_in_projects.all %}
+                                {% if member.project.get_active_order %}
+                                    <a class="dropdown-item d-flex align-items-center" href="#" id="{{ member.project.get_active_order.id }}" onclick="SelectOrder('{{ member.project.name }}', {{ member.project.get_active_order.id }})">
+                                        <div class="font-weight-bold">
+                                            <div class="text-truncate">{{ member.project.name }}</div>
+                                            <div class="small text-gray-500">Заказ</div>
+                                            {% if user.active_order.id == member.project.get_active_order.id %}
+                                                <div class="badge badge-pill badge-success">Активный</div>
+                                            {% else %}
+                                                <div class="badge badge-pill badge-secondary">Не выбран</div>
+                                            {% endif %}
+
+                                        </div>
+                                    </a>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </li>
+                    {% endif %}
 
                     <!-- Nav Item - Alerts -->
                     <li class="nav-item dropdown no-arrow mx-1">
@@ -310,7 +350,7 @@
                             <!-- Dropdown - User Information -->
                             <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                                  aria-labelledby="userDropdown">
-                                <a class="dropdown-item" href="#">
+                                <a class="dropdown-item" href="{% url 'profile_url' %}">
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Profile
                                 </a>
@@ -406,6 +446,57 @@
 <script src="{% static '/js/sb-admin-2.min.js' %}"></script>
 <script src="{% static '/js/pilaru.js' %}"></script>
 
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const csrftoken = getCookie('csrftoken');
+
+    function SelectOrder(project_name, order_id){
+        $.ajax({
+            url: '/orders/api/set_active_order',
+            type: 'post',
+            data: { 'project_name': project_name, 'set_active_order_id': order_id },
+            headers: {
+                'X-CSRFToken': csrftoken,
+            },
+            dataType: 'json',
+            success: function (data) { 
+                var element = document.getElementById(data['active']).getElementsByClassName('badge badge-pill badge-secondary')[0];
+                if (element != undefined){
+                    element.innerHTML = 'Активный'
+                    element.className = 'badge badge-pill badge-success';
+                }
+                
+
+                for(var i = 0; i < data['non-active'].length; i++){
+                    var element = document.getElementById(data['non-active'][i]).getElementsByClassName('badge badge-pill badge-success')[0]
+                    if (element != undefined){
+                        element.innerHTML = 'Не выбран'
+                        element.className = 'badge badge-pill badge-secondary';
+                    }
+                }
+                
+            },
+            error: function (e) {
+                alert('Ошибка запроса к серверу: ' + e['error']);
+            }
+        });
+    }
+</script>
 {% block custom_script %}
 {% endblock %}
 

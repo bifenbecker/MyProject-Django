@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'accounts',
     'items',
     'orders',
+    'projects',
 ]
 
 MIDDLEWARE = [
@@ -69,6 +70,11 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'libraries': {
+                'get_item': 'orders.templatetags.order_tags',
+                'index': 'orders.templatetags.order_tags',
+
+            }
         },
     },
 ]
@@ -137,8 +143,10 @@ STATIC_URL = '/pilaru/static/'
 if IS_LOCAL_DEV:
     STATIC_ROOT = ''
     STATICFILES_DIRS = (os.path.join('static'), )
+    URL_BASE = 'http://localhost:8000'
 else:
     STATIC_ROOT = os.path.join('static')
+    URL_BASE = 'https://ssserver.cf/pilaru'
 
 
 # Default primary key field type

@@ -19,7 +19,7 @@ class OrderStateAdmin(admin.ModelAdmin):
 
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['id', "created_by", 'created_date']
+    list_display = ['id', "created_by", 'created_date', 'project']
     list_filter = ["created_date"]
     readonly_fields = ('created_by', "created_date", )
     search_fields = ["created_by"]

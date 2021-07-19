@@ -29,6 +29,7 @@ class OrderState(models.Model):
 
 
 class Order(models.Model):
+    project = models.ForeignKey('projects.Project', on_delete=models.CASCADE, related_name='orders_in_project', null=True)
     created_by = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='orders', verbose_name='Создатель')
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
 
@@ -39,7 +40,11 @@ class Order(models.Model):
         order_state_to_order = self.get_order_state()
         if order_state_to_order:
             order_state_to_order.finished_date = datetime.now()
+            order_state_to_order.save()
         OrderStateToOrder.objects.create(order=self, state=new_order_state)
+
+    def __str__(self):
+        return str(self.created_by)
 
     class Meta:
         verbose_name = 'Заказ'
