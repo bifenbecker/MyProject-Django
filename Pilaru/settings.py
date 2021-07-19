@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-i(h0av4!oxe*w01@p*k0mf6@72swhaj@**+7*ngrkk2)=_+-ca
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['ssserver.cf']
+ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'accounts',
     'items',
     'orders',
+    'projects',
 ]
 
 MIDDLEWARE = [
@@ -68,6 +69,11 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'libraries': {
+                'get_item': 'orders.templatetags.order_tags',
+                'index': 'orders.templatetags.order_tags',
+
+            }
         },
     },
 ]
@@ -80,8 +86,12 @@ WSGI_APPLICATION = 'Pilaru.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'pilaru',
+        'USER':'admin',
+        'PASSWORD':'admin',
+        'HOST':'localhost',
+        'PORT':'',
     }
 }
 
@@ -123,7 +133,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join('static')
+STATIC_ROOT = ''
+STATICFILES_DIRS = ( os.path.join('static'), )
 
 
 # Default primary key field type
@@ -134,3 +145,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 LOGIN_REDIRECT_URL = '/items/search/'
+
+AUTH_USER_MODEL = 'accounts.User'
+
+PAGE_TITLE_PREFIX = 'Pila.Ru - '
+
+IS_LOCAL_RUN = False
+
+if IS_LOCAL_RUN:
+    URL_BASE = 'http://localhost:8000'
+else:
+    URL_BASE = 'https://ssserver.cf/pilaru'

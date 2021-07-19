@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+
+
+{% block content %}
+{% if error %}
+<h4>{{ error }}</h4>
+{% else %}
+<ul>
+    {% for project in project_list %}
+        <a href="{% url 'project_detail_url' project_id=project.id %}">{{ project.name }} - {{ project.created_date }}</a><br>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

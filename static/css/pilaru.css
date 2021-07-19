@@ -1,0 +1,24 @@
+.badged-cart-wrap[data-count]:after{
+    position:absolute;
+    right:-4px;
+    top:-4px;
+    content: attr(data-count);
+    font-size:13px;
+    padding:.2em;
+    border-radius:4px;
+    line-height:1em;
+    color: white;
+    background:#4e73df;
+    text-align:center;
+    min-width: 1em;
+}
+
+.badged-cart-wrap{
+    height: 1.5rem;
+    width: 2rem;
+}
+
+.badged-cart{
+    line-height: 2rem;
+}
+

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block custom_head %}
+{% endblock %}
+
+{% block content %}
+
+<a href="{% url 'password_change_url' %}"><button class="btn btn-primary">Смена пароля</button></a>
+<a href="{% url 'username_change_url' %}"><button class="btn btn-primary">Сменить Имя пользователя</button></a>
+<br>
+<br>
+<a href="{% url 'project_list_url' %}"><button class="btn btn-primary">Мои проекты</button></a>
+<p>Последний Ваш проект: {{ active_project }}</p>
+
+{% endblock %}

@@ -1,29 +1,73 @@
 from django.core.management.base import BaseCommand
-from items.models import Supplier, ItemCategory, Item
+from django.db.models.deletion import ProtectedError
+from items.models import Supplier, ItemCategory, Item, Product
+from orders.models import Stage, OrderState, OrderStateToOrder, Order, PriceOffer, ItemToOrder
+import random
 
 
 class Command(BaseCommand):
     help = 'Fills database with test data'
 
     def handle(self, *args, **options):
+        ItemToOrder.objects.all().delete()
         Item.objects.all().delete()
         Supplier.objects.all().delete()
-        ItemCategory.objects.filter(parent__isnull=False).delete()
-        ItemCategory.objects.all().delete()
+        Product.objects.all().delete()
+        Stage.objects.all().delete()
+        OrderStateToOrder.objects.all().delete()
+        OrderState.objects.all().delete()
+        Order.objects.all().delete()
+        PriceOffer.objects.all().delete()
+        while ItemCategory.objects.all().exists():
+            for ic in ItemCategory.objects.all():
+                try:
+                    ic.delete()
+                except ProtectedError:
+                    pass
 
-        sup1 = Supplier.objects.get_or_create(name='Эльдорадо')[0]
-        sup2 = Supplier.objects.get_or_create(name='Mile')[0]
-        sup3 = Supplier.objects.get_or_create(name='Oma')[0]
+        with open('test_data.tsv', 'r', encoding='utf-8') as f:
+            data = f.readlines()
 
-        ic1 = ItemCategory.objects.get_or_create(name='Стройматериалы')[0]
-        ic2 = ItemCategory.objects.get_or_create(name='Цемент', parent=ic1)[0]
-        ic3 = ItemCategory.objects.get_or_create(name='Доски', parent=ic1)[0]
+        data.pop(0)
+        data.pop(0)
+        data = [row.split('\t') for row in data]
 
-        for i in range(2, 20):
-            Item.objects.create(name='Цемент ' + str(i * 10), supplier=sup1, category=ic2, unit_measurement=8)
+        ic_other = ItemCategory.objects.get_or_create(name='Другое')[0]
 
-        for i in range(2, 15):
-            Item.objects.create(name='Доска дубовая 10x' + str(i * 10), supplier=sup2, category=ic3, unit_measurement=2)
+        suppliers_names = ('Сатурн', 'Планета электрика', 'Стройкомплект', 'Очаг', 'Магазин', 'Современные окна', 'Дострой', )
+        suppliers = [Supplier.objects.get_or_create(name=name)[0] for name in suppliers_names]
 
-        for i in range(2, 15):
-            Item.objects.create(name='Доска из клена 10x' + str(i * 10), supplier=sup2, category=ic3, unit_measurement=2)
+        for order_state_name in ('Активный', 'Завершен', 'Отменен'):
+            OrderState.objects.create(name=order_state_name)
+
+        for row in data:
+            print(row)
+
+            # create categories if all 3 lvls specified
+            if (len(row[2]) > 2) and (len(row[3]) > 2) and (len(row[4]) > 2):
+                ic = ItemCategory.objects.get_or_create(
+                    name=row[4].strip(),
+                    parent=ItemCategory.objects.get_or_create(
+                        name=row[3].strip(),
+                        parent=ItemCategory.objects.get_or_create(name=row[2].strip())[0]
+                    )[0]
+                )[0]
+            else:
+                ic = ic_other
+
+            p = Product.objects.create(
+                name=row[1].strip(),
+                category=ic
+            )
+
+            for supplier in suppliers:
+                if random.random() > 0.5:
+                    Item.objects.create(
+                        name=row[1].strip(),
+                        supplier=supplier,
+                        product=p,
+                        unit_measurement=2
+                    )
+
+            if len(row[5]) > 2:
+                Stage.objects.get_or_create(name=row[5].strip())
