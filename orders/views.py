@@ -296,9 +296,16 @@ class SetActiveOrderAPI(APIView):
 
     def post(self, request):
         data = request.data
-        order = Order.objects.get(id=data['order_id'])
-        if order.project.name != data['project_name']:
-            return Response({'error': 'Неизвестная ошибка'})
-        request.user.set_active_order(order)
-        return Response({'Result': 'ok'})
+        to_set_active_order = Order.objects.get(id=data['set_active_order_id'])
+        request.user.set_active_order(to_set_active_order)
+        orders = {
+            'active': to_set_active_order.id,
+            'non-active': [],
+        }
+        for member_in_project in request.user.member_in_projects.all():
+            active_order_in_project = member_in_project.project.get_active_order()
+            if active_order_in_project and active_order_in_project.id != to_set_active_order.id:
+                orders['non-active'].append(active_order_in_project.id)
+
+        return Response(orders)
 # endregion

@@ -34,8 +34,6 @@ function api_add_item_to_order(btn, item_id) {
         success: function (data) {
             if (data['result'] !== 'ok'){
                 alert(data['result'])
-            else if(data['error'] === 'Create'){
-                continue;
             }else{
                 let current_qty = parseInt($span.attr('data-count'));
                 if (isNaN(current_qty)) {
@@ -106,7 +104,8 @@ function api_close_order(order_id) {
 
 }
 
-function setActiveOrder(project_name, order_id){
+function SelectOrder(project_name, order_id){
+    console.log(project_name)
     $.ajax({
         url: '/orders/api/set_active_order',
         type: 'post',

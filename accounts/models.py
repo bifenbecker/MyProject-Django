@@ -8,7 +8,7 @@ from projects.models import Project
 
 class User(AbstractUser):
 
-    active_order = models.OneToOneField('orders.Order', on_delete=models.CASCADE, verbose_name='Активный заказ', null=True, default=None)
+    active_order = models.ForeignKey('orders.Order', on_delete=models.CASCADE, verbose_name='Активный заказ', null=True, default=None)
 
     def get_active_order(self):
         order_state_to_order = OrderStateToOrder.objects.filter(order__created_by=self, state=OrderState.objects.get(name='Активный'), finished_date__isnull=True).first()

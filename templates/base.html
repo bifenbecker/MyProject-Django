@@ -189,7 +189,7 @@
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fas fa-th-list"></i>
                             <!-- Counter - Orders -->
-                            <span class="badge badge-danger badge-counter">{{ user.orders.all|length  }}</span>
+                            <span class="badge badge-danger badge-counter">{{ user.member_in_projects.all|length  }}</span>
                         </a>
                         <!-- Dropdown - Orders -->
                         <div id="ActiveOrders" class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
@@ -199,7 +199,7 @@
                             </h6>
                             {% for member in user.member_in_projects.all %}
                                 {% if member.project.get_active_order %}
-                                    <a class="dropdown-item d-flex align-items-center" href="#" onclick="setActiveOrder('{{ member.project.name }}', {{ member.project.get_active_order.id }})">
+                                    <a class="dropdown-item d-flex align-items-center" href="#" id="{{ member.project.get_active_order.id }}" onclick="SelectOrder('{{ member.project.name }}', {{ member.project.get_active_order.id }})">
                                         <div class="font-weight-bold">
                                             <div class="text-truncate">{{ member.project.name }}</div>
                                             <div class="small text-gray-500">Заказ</div>
@@ -445,6 +445,57 @@
 <script src="/static/js/sb-admin-2.min.js"></script>
 <script src="/static/js/pilaru.js"></script>
 
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const csrftoken = getCookie('csrftoken');
+
+    function SelectOrder(project_name, order_id){
+        $.ajax({
+            url: '/orders/api/set_active_order',
+            type: 'post',
+            data: { 'project_name': project_name, 'set_active_order_id': order_id },
+            headers: {
+                'X-CSRFToken': csrftoken,
+            },
+            dataType: 'json',
+            success: function (data) { 
+                var element = document.getElementById(data['active']).getElementsByClassName('badge badge-pill badge-secondary')[0];
+                if (element != undefined){
+                    element.innerHTML = 'Активный'
+                    element.className = 'badge badge-pill badge-success';
+                }
+                
+
+                for(var i = 0; i < data['non-active'].length; i++){
+                    var element = document.getElementById(data['non-active'][i]).getElementsByClassName('badge badge-pill badge-success')[0]
+                    if (element != undefined){
+                        element.innerHTML = 'Не выбран'
+                        element.className = 'badge badge-pill badge-secondary';
+                    }
+                }
+                
+            },
+            error: function (e) {
+                alert('Ошибка запроса к серверу: ' + e['error']);
+            }
+        });
+    }
+</script>
 {% block custom_script %}
 {% endblock %}
 
