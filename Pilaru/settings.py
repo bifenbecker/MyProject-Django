@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-i(h0av4!oxe*w01@p*k0mf6@72swhaj@**+7*ngrkk2)=_+-ca'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-IS_LOCAL_DEV = True
+IS_LOCAL_DEV = False
 DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1'] if IS_LOCAL_DEV else ['ssserver.cf']

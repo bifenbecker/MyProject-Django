@@ -120,3 +120,4 @@ GitHub.sublime-settings
 
 static/admin
 static/rest_framework
+logs/

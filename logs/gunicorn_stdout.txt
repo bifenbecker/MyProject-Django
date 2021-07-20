@@ -1223,3 +1223,39 @@ AttributeError: 'AnonymousUser' object has no attribute 'get_active_order'
  - - [20/Jul/2021:00:08:30 +0300] "GET /pilaru/accounts/login/ HTTP/1.0" 200 4247 "-" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36"
 Not Found: /pilaru/project/invite/4580992e-5205-4068-b151-7413a46507f0
  - - [20/Jul/2021:00:43:19 +0300] "GET /pilaru/project/invite/4580992e-5205-4068-b151-7413a46507f0 HTTP/1.0" 404 3089 "-" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36"
+[2021-07-19 22:02:25 +0000] [11989] [INFO] Handling signal: term
+[2021-07-20 01:02:25 +0300] [11992] [INFO] Worker exiting (pid: 11992)
+[2021-07-20 01:02:25 +0300] [11993] [INFO] Worker exiting (pid: 11993)
+[2021-07-20 01:02:26 +0300] [11995] [INFO] Worker exiting (pid: 11995)
+[2021-07-19 22:02:26 +0000] [11989] [INFO] Shutting down: Master
+[2021-07-19 22:09:39 +0000] [440] [INFO] Starting gunicorn 19.9.0
+[2021-07-19 22:09:39 +0000] [440] [INFO] Listening at: unix:/run/pilaru.sock (440)
+[2021-07-19 22:09:39 +0000] [440] [INFO] Using worker: gevent
+[2021-07-19 22:09:39 +0000] [443] [INFO] Booting worker with pid: 443
+[2021-07-19 22:09:39 +0000] [444] [INFO] Booting worker with pid: 444
+[2021-07-19 22:09:39 +0000] [445] [INFO] Booting worker with pid: 445
+ - - [20/Jul/2021:01:09:46 +0300] "GET /pilaru/ HTTP/1.0" 302 0 "-" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36"
+ - - [20/Jul/2021:01:09:47 +0300] "GET /pilaru/accounts/login/ HTTP/1.0" 200 4247 "-" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36"
+ - - [20/Jul/2021:01:10:24 +0300] "GET /pilaru/accounts/registration/ HTTP/1.0" 200 4266 "https://ssserver.cf/pilaru/accounts/login/" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36"
+ - - [20/Jul/2021:01:10:26 +0300] "GET /pilaru/accounts/registration/ HTTP/1.0" 200 4266 "https://www.google.com/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36"
+ - - [20/Jul/2021:01:10:33 +0300] "POST /pilaru/accounts/registration/ HTTP/1.0" 302 0 "https://ssserver.cf/pilaru/accounts/registration/" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36"
+ - - [20/Jul/2021:01:10:34 +0300] "GET /pilaru/items/search/ HTTP/1.0" 200 281763 "https://ssserver.cf/pilaru/accounts/registration/" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36"
+ - - [20/Jul/2021:01:10:39 +0300] "GET /pilaru/orders/active/ HTTP/1.0" 200 23807 "https://ssserver.cf/pilaru/items/search/" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36"
+ - - [20/Jul/2021:01:10:44 +0300] "GET /pilaru/items/search/ HTTP/1.0" 200 281763 "https://ssserver.cf/pilaru/orders/active/" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36"
+ - - [20/Jul/2021:01:10:46 +0300] "GET /pilaru/items/view/1 HTTP/1.0" 200 31478 "https://ssserver.cf/pilaru/items/search/" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36"
+ - - [20/Jul/2021:01:10:48 +0300] "POST /pilaru/orders/api/add_item_to_order HTTP/1.0" 200 69 "https://ssserver.cf/pilaru/items/view/1" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36"
+ - - [20/Jul/2021:01:10:52 +0300] "GET /pilaru/project/create-project HTTP/1.0" 200 23188 "https://ssserver.cf/pilaru/items/view/1" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36"
+ - - [20/Jul/2021:01:10:56 +0300] "POST /pilaru/project/create-project HTTP/1.0" 302 0 "https://ssserver.cf/pilaru/project/create-project" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36"
+ - - [20/Jul/2021:01:10:56 +0300] "GET /pilaru/project/1 HTTP/1.0" 200 25692 "https://ssserver.cf/pilaru/project/create-project" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36"
+ - - [20/Jul/2021:01:11:02 +0300] "POST /pilaru/project/1 HTTP/1.0" 200 25770 "https://ssserver.cf/pilaru/project/1" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36"
+ - - [20/Jul/2021:01:11:07 +0300] "GET /pilaru/project/invite/af8687a1-07f7-4b68-ac4a-e3dfe56f6395 HTTP/1.0" 200 23957 "-" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36"
+ - - [20/Jul/2021:01:11:10 +0300] "GET /pilaru/items/search/ HTTP/1.0" 200 282544 "https://ssserver.cf/pilaru/project/invite/af8687a1-07f7-4b68-ac4a-e3dfe56f6395" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36"
+ - - [20/Jul/2021:01:11:12 +0300] "GET /pilaru/items/view/101 HTTP/1.0" 200 30624 "https://ssserver.cf/pilaru/items/search/" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36"
+ - - [20/Jul/2021:01:11:14 +0300] "POST /pilaru/orders/api/add_item_to_order HTTP/1.0" 200 15 "https://ssserver.cf/pilaru/items/view/101" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36"
+ - - [20/Jul/2021:01:11:14 +0300] "POST /pilaru/orders/api/add_item_to_order HTTP/1.0" 200 15 "https://ssserver.cf/pilaru/items/view/101" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36"
+ - - [20/Jul/2021:01:11:14 +0300] "POST /pilaru/orders/api/add_item_to_order HTTP/1.0" 200 15 "https://ssserver.cf/pilaru/items/view/101" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36"
+ - - [20/Jul/2021:01:11:17 +0300] "GET /pilaru/orders/active/ HTTP/1.0" 200 34199 "https://ssserver.cf/pilaru/items/view/101" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.164 Safari/537.36"
+ - - [20/Jul/2021:04:49:03 +0300] "GET /pilaru/ HTTP/1.0" 302 0 "-" "TelegramBot (like TwitterBot)"
+ - - [20/Jul/2021:04:49:03 +0300] "GET /pilaru/accounts/login/ HTTP/1.0" 200 4247 "-" "TelegramBot (like TwitterBot)"
+ - - [20/Jul/2021:04:49:06 +0300] "GET /pilaru/ HTTP/1.0" 302 0 "-" "Mozilla/5.0 (Linux; Android 10; SM-G960F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Mobile Safari/537.36"
+ - - [20/Jul/2021:04:49:06 +0300] "GET /pilaru/accounts/login/ HTTP/1.0" 200 4247 "-" "Mozilla/5.0 (Linux; Android 10; SM-G960F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Mobile Safari/537.36"
