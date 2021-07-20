@@ -149,3 +149,10 @@ LOGIN_REDIRECT_URL = '/items/search/'
 AUTH_USER_MODEL = 'accounts.User'
 
 PAGE_TITLE_PREFIX = 'Pila.Ru - '
+
+IS_LOCAL_RUN = False
+
+if IS_LOCAL_RUN:
+    URL_BASE = 'http://localhost:8000'
+else:
+    URL_BASE = 'https://ssserver.cf/pilaru'

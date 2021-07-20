@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 
 from orders.models import Stage, Order
@@ -60,7 +60,7 @@ class ProjectDetailView(View):
         creator = project.members.all().filter(access=0).first()
 
         context = {
-            'page_title': settings.PAGE_TITLE_PREFIX + 'Проект:' + str(project_id),
+            'page_title': settings.PAGE_TITLE_PREFIX + 'Проект:' + str(project.id),
             'toolbar_title': project.name,
             'project': project,
             'creator': creator,
@@ -70,16 +70,21 @@ class ProjectDetailView(View):
         return render(request, self.template_name, context=context)
 
     @is_auth
-    def post(self, request, *args, **kwargs):
-        project = Project.objects.get(id=kwargs.get('project_id'))
+    def post(self, request, project_id):
+        project = Project.objects.get(id=project_id)
         creator = project.members.all().filter(access=0).first()
+
         project_member = request.user.member_in_projects.get(project=project)
-        invite_link = InviteLinkToProject.objects.create(member_invite=project_member, project=project)
+        invite_link = InviteLinkToProject(member_invite=project_member, project=project)
+        invite_link.save()
+
         context = {
             'page_title': settings.PAGE_TITLE_PREFIX + 'Проект:' + str(project.id),
             'toolbar_title': project.name,
             'project': project,
             'creator': creator,
+            'last_price': get_last_price_by_order(request.user, project.get_active_order()) if project.get_active_order() else None,
+            'stages': Stage.objects.all(),
             'invite_link': invite_link,
             'last_price': get_last_price_by_order(request.user,
                                                   project.get_active_order()) if project.get_active_order() else None,
@@ -112,32 +117,31 @@ class ProjectListView(View):
 
 # TODO: Fix invite link(need to work last gen link)
 class InviteToProjectView(View):
-    temaplte_name = 'invite_to_project.html'
+    template_name = 'invite_to_project.html'
 
     @is_auth
-    def get(self, request, *args, **kwargs):
-        member_invite_id = request.GET.get('member_invite_id')
-        member_invite = ProjectMember.objects.get(id=member_invite_id)
+    def get(self, request, link_key):
+        invite_link = get_object_or_404(InviteLinkToProject, link_key=link_key)
         context = {
             'page_title': settings.PAGE_TITLE_PREFIX + 'Приглашение',
             'toolbar_title': 'Приглашение в проект',
-            'member_invite': member_invite,
-            'project_name': request.GET.get('project_name'),
+            'invite_link': invite_link,
         }
-        if member_invite.user == request.user:
+        if invite_link.member_invite.user == request.user:
             context.update({'message': 'Вы пытаетесь пригласить себя :)'})
-        return render(request, self.temaplte_name, context=context)
+        return render(request, self.template_name, context=context)
 
     @is_auth
-    def post(self, request, *args, **kwargs):
+    def post(self, request, link_key):
         try:
-            project = Project.objects.get(id=request.GET.get('project_id'), name=request.GET.get('project_name'))
+            invite_link = get_object_or_404(InviteLinkToProject, link_key=link_key)
+            project = invite_link.project
             user = request.user
             for member in project.members.all():
                 if member.user == user:
                     return redirect('project_detail_url', project_id=project.id)
 
-            new_member_project = ProjectMember.objects.create(access=1, user=user, project=project)
+            ProjectMember.objects.create(access=1, user=user, project=project)
             return redirect('project_detail_url', project_id=project.id)
         except:
             return redirect('search_url')
