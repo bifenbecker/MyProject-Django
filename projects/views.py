@@ -81,6 +81,9 @@ class ProjectDetailView(View):
             'project': project,
             'creator': creator,
             'invite_link': invite_link,
+            'last_price': get_last_price_by_order(request.user,
+                                                  project.get_active_order()) if project.get_active_order() else None,
+            'stages': Stage.objects.all(),
         }
         return render(request, self.template_name, context=context)
 
@@ -107,6 +110,7 @@ class ProjectListView(View):
         return render(request, self.template_name, context=context)
 
 
+# TODO: Fix invite link(need to work last gen link)
 class InviteToProjectView(View):
     temaplte_name = 'invite_to_project.html'
 
