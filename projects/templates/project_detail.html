@@ -50,7 +50,11 @@
                                     <td>{{ item_to_order.item.name }}</td>
                                     <td><select name="" id="">
                                         {% for stage in stages %}
-                                            <option value="">{{ stage.name }}</option>
+                                            {% if stage.id == item_to_order.stage.id %}
+                                            <option value="{{ stage.name }}_{{ stage.id }}" id="{{ item_to_order.id }}" selected>{{ stage.name }}</option>
+                                            {% else %}
+                                            <option value="{{ stage.name }}_{{ stage.id }}" id="{{ item_to_order.id }}">{{ stage.name }}</option>
+                                            {% endif %}
                                         {% endfor %}
                                     </select></td>
                                     <td>{{ item_to_order.item.supplier.name }}</td>
@@ -82,5 +86,31 @@
             <canvas id="chart" width="500" height="500"></canvas>
         </window>
     </div>
+
+{% endblock %}
+{% block custom_script %}
+<script>
+   $(document.body).on("change","#stages",function(){
+        console.log(1);
+        var product_stage_id = this.value;
+        var item_to_order_id = this['children'][0]['id'];
+        $.ajax({
+            // TODO:Need To change
+            url: 'http://127.0.0.1:8000/pilaru/items/api/set_stage',
+            type: 'post',
+            data: { 'product_stage_id': product_stage_id, 'item_to_order_id': item_to_order_id },
+            headers: {
+                'X-CSRFToken': csrftoken,
+            },
+            dataType: 'json',
+            success: function (data) {
+
+            },
+            error: function (e) {
+                alert('Ошибка запроса к серверу: ' + e['error']);
+            }
+        });
+    });
+</script>
 
 {% endblock %}

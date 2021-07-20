@@ -1,5 +1,5 @@
 from items.models import *
-from orders.models import Order, ItemToOrder
+from orders.models import Order, ItemToOrder, Stage
 from .serializer import ProductSerializer
 
 from django.views.generic.base import TemplateView
@@ -116,3 +116,16 @@ class SearchItemsAPI(APIView):
             return Response({'Result': products_serializer})
         except Exception as e:
             return Response({'Result': str(e)})
+
+
+class SetItemStageAPI(APIView):
+
+    def post(self, request):
+        item_to_order = ItemToOrder.objects.get(id=request.data['item_to_order_id'])
+        product_stage_name = request.data['product_stage_id'].split('_')[0]
+        product_stage_id = request.data['product_stage_id'].split('_')[1]
+        print(product_stage_name, product_stage_id)
+        print(item_to_order)
+        stage = Stage.objects.get(id=product_stage_id, name=product_stage_name)
+        item_to_order.set_stage(stage)
+        return Response({'Result': 'OK'})

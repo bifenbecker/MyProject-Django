@@ -14,6 +14,7 @@ display: block;
 
 }
 
+
 #show-graph {
 
 background: rgba(102, 102, 102, 0.68);
@@ -66,6 +67,10 @@ border: none;
 
 }
 
+.dropdown-tr{
+    display: none;
+}
+
 </style>
 {% endblock %}
 
@@ -91,17 +96,22 @@ border: none;
                                 <th>Цена за единицу</th>
                                 <th>Сумма</th>
                                 <th>Последняя цена - Поставщик</th>
+                                <th>Выбрать аналог</th>
                                 <th></th>
                             </tr>
                             </thead>
                             <tbody>
                             {% for item_to_order in active_order.items_in_order.all %}
-                                <tr>
+                                <tr id="{{ item_to_order.item.id }}">
                                     <td>{{ item_to_order.item.id }}</td>
                                     <td>{{ item_to_order.item.name }}</td>
-                                    <td><select name="" id="">
+                                    <td><select name="select_stage" id="stages" onchange="">
                                         {% for stage in stages %}
-                                            <option value="">{{ stage.name }}</option>
+                                            {% if stage.id == item_to_order.stage.id %}
+                                            <option value="{{ stage.name }}_{{ stage.id }}" id="{{ item_to_order.id }}" selected>{{ stage.name }}</option>
+                                            {% else %}
+                                            <option value="{{ stage.name }}_{{ stage.id }}" id="{{ item_to_order.id }}">{{ stage.name }}</option>
+                                            {% endif %}
                                         {% endfor %}
                                     </select></td>
                                     <td>{{ item_to_order.item.supplier.name }}</td>
@@ -111,9 +121,33 @@ border: none;
                                     <td>{% if item_to_order.get_total_price %}{{ item_to_order.get_total_price|floatformat:2 }}{% else %}-{% endif %}</td>
                                     <td>{{ last_price|get_item:active_order.id|get_item:item_to_order.id|index:0 }} - {{ last_price|get_item:active_order.id|get_item:item_to_order.id|index:1 }}</td>
                                     <td>
+                                        <button class="btn btn-secondary" id="showAnalogs"">Выбрать аналог</button>
+                                    </td>
+                                    <td>
                                         <button class="btn p-0" onclick="api_remove_item_from_order({{ item_to_order.id }})"><i class="fas fa-trash-alt fa-lg"></i></button>
                                     </td>
                                 </tr>
+                                
+
+<!--                                    {% for similar_product in item_to_order.item.product.similar.all %}-->
+<!--                                        {% for similar_item in similar_product.items.all %}-->
+<!--                                            <tr class="dropdown-tr" id="{{ item_to_order.item.id }}">-->
+<!--                                                <td>П{{ similar_item.id }}</td>-->
+<!--                                                <td>{{ similar_item.name }}</td>-->
+<!--                                                <td>{{ similar_item.supplier.name }}</td>-->
+<!--                                                <td>{{ similar_item.get_unit_measurement_display }}</td>-->
+<!--                                                <td><input class="form-control" type="number" name="item_qty" min="1" step="1" value="{{ item_to_order.quantity }}" onchange="api_change_item_qty_in_order(this, {{ item_to_order.id }})"></td>-->
+<!--                                                <td><span>{% if item_to_order.price_offer %}{{ item_to_order.price_offer.price_per_unit|floatformat:2 }}{% else %}-{% endif %}</span><span style="float: right"><button onclick="showGraph('{{ item_to_order.item.name }}', '{{ item_to_order.item.supplier.name }}')" class="btn btn-primary">График</button></span></td>-->
+<!--                                                <td>-->
+<!--                                                    <button class="btn p-0" onclick="api_add_item_to_order(this, {{ similar_item.id }})">-->
+<!--                                                        <span class="badged-cart-wrap fa-stack fa-2x has-badge" data-count="{{ similar_item|get_items_qty_in_order:active_order }}">-->
+<!--                                                            <i class="badged-cart fas fa-cart-plus fa-stack-1x xfa-inverse fa-xs"></i>-->
+<!--                                                        </span>-->
+<!--                                                    </button>-->
+<!--                                                </td>-->
+<!--                                            </tr>-->
+<!--                                        {% endfor %}-->
+<!--                                    {% endfor %}        -->
                             {% endfor %}
                             </tbody>
                         </table>
@@ -130,6 +164,10 @@ border: none;
            
             <canvas id="chart" width="500" height="500"></canvas>
         </window>
+        <window>
+           <a href="#close_window" class="close_window">X</a>
+            
+        </window>
     </div>
 {% endblock %}
 
@@ -142,9 +180,8 @@ border: none;
     <script src="/static/js/pilaru.js"></script>
     <script>
 
+
         function setGraph(obj){
-            console.log(Object.keys(obj['Data']));
-            console.log(Object.values(obj['Data']))
             const data = {
                         labels: Object.keys(obj['Data']),
                         datasets: [{
@@ -170,7 +207,7 @@ border: none;
             const csrftoken = getCookie('csrftoken');
             
             $.ajax({
-                url: '/orders/api/price_history',
+                url: 'http://127.0.0.1:8000/pilaru/orders/api/price_history',
                 type: 'post',
                 data: { 'name': item_name, 'supplier': supplier_name },
                 headers: {

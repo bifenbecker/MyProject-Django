@@ -95,6 +95,10 @@ class ItemToOrder(models.Model):
         else:
             return None
 
+    def set_stage(self, stage: Stage):
+        self.stage = stage
+        self.save()
+
     class Meta:
         ordering = ['id']
         verbose_name = 'Товар в заказе'

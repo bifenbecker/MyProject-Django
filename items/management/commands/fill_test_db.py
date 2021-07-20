@@ -40,6 +40,7 @@ class Command(BaseCommand):
         for order_state_name in ('Активный', 'Завершен', 'Отменен'):
             OrderState.objects.create(name=order_state_name)
 
+
         for row in data:
             print(row)
 
@@ -72,3 +73,6 @@ class Command(BaseCommand):
 
             if len(row[5]) > 2:
                 Stage.objects.get_or_create(name=row[5].strip())
+
+        for product in Product.objects.all():
+            product.similar.add(random.choice(Product.objects.all()))

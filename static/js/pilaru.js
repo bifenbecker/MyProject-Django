@@ -108,7 +108,6 @@ function api_close_order(order_id) {
 }
 
 function SelectOrder(project_name, order_id){
-    console.log(project_name)
     $.ajax({
         url: '/orders/api/set_active_order',
         type: 'post',
@@ -146,3 +145,41 @@ $(document).on('click', function(e) {
 function filterElements(element){
     return element.getElementsByClassName('badge badge-pill badge-success').length != 0;
 }
+
+$(document.body).on("change","#stages",function(){
+    console.log(1);
+    var product_stage_id = this.value;
+    var item_to_order_id = this['children'][0]['id'];
+    $.ajax({
+        // TODO:Need To change
+        url: 'http://127.0.0.1:8000/pilaru/items/api/set_stage',
+        type: 'post',
+        data: { 'product_stage_id': product_stage_id, 'item_to_order_id': item_to_order_id },
+        headers: {
+            'X-CSRFToken': csrftoken,
+        },
+        dataType: 'json',
+        success: function (data) { 
+            
+        },
+        error: function (e) {
+            alert('Ошибка запроса к серверу: ' + e['error']);
+        }
+    });
+});
+
+$(document.body).on("click","#showAnalogs",function(){
+    var item_to_order_item_id = this.parentElement.parentElement.children[0].innerHTML;
+    $('#' + item_to_order_item_id).after('<tr class="remove-row_"' + item_to_order_item_id + '><td>1</td><td>2</td></tr><tr "remove-row_"' + item_to_order_item_id + '><td>3</td><td>4</td></tr>');
+    
+    $('#dataTable').each(function(){
+        console.log(this);
+    })
+
+    if($('#dataTable').find('.remove-row_' + item_to_order_item_id)){
+        console.log(100);
+    }
+
+    
+});
+
