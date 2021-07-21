@@ -170,7 +170,7 @@ $(document.body).on("change","#stages",function(){
 
 $(document.body).on("click","#showAnalogs",function(){
     var item_to_order_item_id = this.parentElement.parentElement.children[0].innerHTML;
-    
+    console.log(item_to_order_item_id);
     var remove_trs = Array.from(this.parentElement.parentElement.parentElement.children).filter(function(tr){
         return tr.className === 'remove-row_' + item_to_order_item_id;
     })
@@ -202,7 +202,6 @@ $(document.body).on("click","#showAnalogs",function(){
 });
 
 function replaceItem(btn, item_id){
-    // api_add_item_to_order(btn, item_id); This work good
-
-    
+    api_add_item_to_order(btn, item_id);
+    window.location.reload();
 }

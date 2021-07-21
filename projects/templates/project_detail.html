@@ -33,6 +33,7 @@
                         <table class="table table-bordered w-100" id="dataTable" cellspacing="0">
                             <thead>
                             <tr>
+                                <th>Номер</th>
                                 <th>Название</th>
                                 <th>Этап</th>
                                 <th>Поставщик</th>
@@ -41,12 +42,14 @@
                                 <th>Цена за единицу</th>
                                 <th>Сумма</th>
                                 <th>Последняя цена - Поставщик</th>
+                                <th>Выбрать аналог</th>
                                 <th></th>
                             </tr>
                             </thead>
                             <tbody>
                             {% for item_to_order in project.get_active_order.items_in_order.all %}
-                                <tr>
+                                <tr id="{{ item_to_order.item.id }}">
+                                    <td>{{ item_to_order.item.id }}</td>
                                     <td>{{ item_to_order.item.name }}</td>
                                     <td><select name="" id="">
                                         {% for stage in stages %}
@@ -63,6 +66,9 @@
                                     <td><span>{% if item_to_order.price_offer %}{{ item_to_order.price_offer.price_per_unit|floatformat:2 }}{% else %}-{% endif %}</span><span style="float: right"><button onclick="showGraph('{{ item_to_order.item.name }}', '{{ item_to_order.item.supplier.name }}')" class="btn btn-primary">График</button></span></td>
                                     <td>{% if item_to_order.get_total_price %}{{ item_to_order.get_total_price|floatformat:2 }}{% else %}-{% endif %}</td>
                                     <td>{{ last_price|get_item:item_to_order.id|index:0 }} - {{ last_price|get_item:item_to_order.id|index:1 }}</td>
+                                    <td>
+                                        <button class="btn btn-secondary" id="showAnalogs"">Выбрать аналог</button>
+                                    </td>
                                     <td>
                                         <button class="btn p-0" onclick="api_remove_item_from_order({{ item_to_order.id }})"><i class="fas fa-trash-alt fa-lg"></i></button>
                                     </td>

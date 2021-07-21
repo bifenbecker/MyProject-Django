@@ -127,27 +127,6 @@ border: none;
                                         <button class="btn p-0" onclick="api_remove_item_from_order({{ item_to_order.id }})"><i class="fas fa-trash-alt fa-lg"></i></button>
                                     </td>
                                 </tr>
-                                
-
-<!--                                    {% for similar_product in item_to_order.item.product.similar.all %}-->
-<!--                                        {% for similar_item in similar_product.items.all %}-->
-<!--                                            <tr class="dropdown-tr" id="{{ item_to_order.item.id }}">-->
-<!--                                                <td>П{{ similar_item.id }}</td>-->
-<!--                                                <td>{{ similar_item.name }}</td>-->
-<!--                                                <td>{{ similar_item.supplier.name }}</td>-->
-<!--                                                <td>{{ similar_item.get_unit_measurement_display }}</td>-->
-<!--                                                <td><input class="form-control" type="number" name="item_qty" min="1" step="1" value="{{ item_to_order.quantity }}" onchange="api_change_item_qty_in_order(this, {{ item_to_order.id }})"></td>-->
-<!--                                                <td><span>{% if item_to_order.price_offer %}{{ item_to_order.price_offer.price_per_unit|floatformat:2 }}{% else %}-{% endif %}</span><span style="float: right"><button onclick="showGraph('{{ item_to_order.item.name }}', '{{ item_to_order.item.supplier.name }}')" class="btn btn-primary">График</button></span></td>-->
-<!--                                                <td>-->
-<!--                                                    <button class="btn p-0" onclick="api_add_item_to_order(this, {{ similar_item.id }})">-->
-<!--                                                        <span class="badged-cart-wrap fa-stack fa-2x has-badge" data-count="{{ similar_item|get_items_qty_in_order:active_order }}">-->
-<!--                                                            <i class="badged-cart fas fa-cart-plus fa-stack-1x xfa-inverse fa-xs"></i>-->
-<!--                                                        </span>-->
-<!--                                                    </button>-->
-<!--                                                </td>-->
-<!--                                            </tr>-->
-<!--                                        {% endfor %}-->
-<!--                                    {% endfor %}        -->
                             {% endfor %}
                             </tbody>
                         </table>
