@@ -170,16 +170,39 @@ $(document.body).on("change","#stages",function(){
 
 $(document.body).on("click","#showAnalogs",function(){
     var item_to_order_item_id = this.parentElement.parentElement.children[0].innerHTML;
-    $('#' + item_to_order_item_id).after('<tr class="remove-row_"' + item_to_order_item_id + '><td>1</td><td>2</td></tr><tr "remove-row_"' + item_to_order_item_id + '><td>3</td><td>4</td></tr>');
     
-    $('#dataTable').each(function(){
-        console.log(this);
+    var remove_trs = Array.from(this.parentElement.parentElement.parentElement.children).filter(function(tr){
+        return tr.className === 'remove-row_' + item_to_order_item_id;
     })
-
-    if($('#dataTable').find('.remove-row_' + item_to_order_item_id)){
-        console.log(100);
+    if(remove_trs.length !== 0){
+        remove_trs.forEach(function(item, i, arr){
+            $(item).remove();
+        })
+    }else{
+        $.ajax({
+            // TODO:Need To change
+            url: 'http://127.0.0.1:8000/pilaru/items/api/get_similar',
+            type: 'get',
+            data: { 'item_to_order_item_id': item_to_order_item_id },
+            headers: {
+                'X-CSRFToken': csrftoken,
+            },
+            dataType: 'json',
+            success: function (data) { 
+                data['similars'].forEach(function(item, i, arr){
+                    $('#' + item_to_order_item_id).after('<tr class=remove-row_' + item_to_order_item_id + ' style="border:2px solid #ffccff"><td>' + item['id'] + '</td><td>' + item['name'] + '</td><td>-</td><td>' + item['supplier'] + '</td><td>' + item['unit_measurement'] + '</td><td><input class="form-control" type="number" name="item_qty" min="1" step="1" value="1"></td><td></td><td></td><td></td><td><button class="btn btn-info" onclick="replaceItem(this, ' + item['id'] + ')">Заменить</button></td><td></td></tr>');
+                })
+            },
+            error: function (e) {
+                alert('Ошибка запроса к серверу: ' + e['error']);
+            }
+        });
     }
-
     
 });
 
+function replaceItem(btn, item_id){
+    // api_add_item_to_order(btn, item_id); This work good
+
+    
+}

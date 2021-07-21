@@ -11,3 +11,10 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = ['name', 'id', 'items_count']
 
+
+class SimilarItemSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Item
+        fields = ['id', 'name', 'supplier', 'unit_measurement']
+

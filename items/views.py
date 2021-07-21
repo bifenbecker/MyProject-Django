@@ -1,6 +1,6 @@
 from items.models import *
 from orders.models import Order, ItemToOrder, Stage
-from .serializer import ProductSerializer
+from .serializer import *
 
 from django.views.generic.base import TemplateView
 from django.shortcuts import render, get_object_or_404
@@ -129,3 +129,23 @@ class SetItemStageAPI(APIView):
         stage = Stage.objects.get(id=product_stage_id, name=product_stage_name)
         item_to_order.set_stage(stage)
         return Response({'Result': 'OK'})
+
+
+class GetSimilarsAPI(APIView):
+
+    def get(self, request):
+        similars = []
+        try:
+            item_to_order_item_id = request.GET.get('item_to_order_item_id')
+            item = Item.objects.get(id=item_to_order_item_id)
+            for similar_product in item.product.similar.all():
+                item = {}
+                for similar in similar_product.items.all():
+                    item['id'] = similar.id
+                    item['name'] = similar.name
+                    item['supplier'] = similar.supplier.name
+                    item['unit_measurement'] = UNIT_MEASUREMENT_CHOICES[similar.unit_measurement][1]
+                similars.append(item)
+            return Response({'similars': similars})
+        except:
+            return Response({'error': 'Не удалось найти аналоги'})
