@@ -54,6 +54,7 @@ function api_add_item_to_order(btn, item_id) {
 
 
 function api_remove_item_from_order(item_to_order_id) {
+    console.log(item_to_order_id);
     $.ajax({
         url: API_URL_PREFIX + '/orders/api/remove_item_from_order',
         type: 'post',
@@ -169,8 +170,8 @@ $(document.body).on("change","#stages",function(){
 });
 
 $(document.body).on("click","#showAnalogs",function(){
+    var item_id = this.name;
     var item_to_order_item_id = this.parentElement.parentElement.children[0].innerHTML;
-    console.log(item_to_order_item_id);
     var remove_trs = Array.from(this.parentElement.parentElement.parentElement.children).filter(function(tr){
         return tr.className === 'remove-row_' + item_to_order_item_id;
     })
@@ -190,7 +191,7 @@ $(document.body).on("click","#showAnalogs",function(){
             dataType: 'json',
             success: function (data) { 
                 data['similars'].forEach(function(item, i, arr){
-                    $('#' + item_to_order_item_id).after('<tr class=remove-row_' + item_to_order_item_id + ' style="border:2px solid #ffccff"><td>' + item['id'] + '</td><td>' + item['name'] + '</td><td>-</td><td>' + item['supplier'] + '</td><td>' + item['unit_measurement'] + '</td><td><input class="form-control" type="number" name="item_qty" min="1" step="1" value="1"></td><td></td><td></td><td></td><td><button class="btn btn-info" onclick="replaceItem(this, ' + item['id'] + ')">Заменить</button></td><td></td></tr>');
+                    $('#' + item_to_order_item_id + '_item').after('<tr class=remove-row_' + item_to_order_item_id + ' style="border:2px solid #ffccff"><td>' + item['id'] + '</td><td>' + item['name'] + '</td><td>-</td><td>' + item['supplier'] + '</td><td>' + item['unit_measurement'] + '</td><td><input class="form-control" type="number" name="item_qty" min="1" step="1" value="1"></td><td></td><td></td><td></td><td><button class="btn btn-info" onclick="replaceItem(this, ' + item['id'] + ', ' + item_id + ')">Заменить</button></td><td></td></tr>');
                 })
             },
             error: function (e) {
@@ -201,7 +202,7 @@ $(document.body).on("click","#showAnalogs",function(){
     
 });
 
-function replaceItem(btn, item_id){
+function replaceItem(btn, item_id, item_to_order_id){
+    api_remove_item_from_order(item_to_order_id);
     api_add_item_to_order(btn, item_id);
-    window.location.reload();
 }

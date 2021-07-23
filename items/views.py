@@ -94,7 +94,6 @@ class SearchItemsAPI(APIView):
             products = Product.objects.none()
 
             for category in categories:
-                print(category.parent)
                 add_products = Product.objects.filter(category=category, name__icontains=search_product)
 
                 if add_products.exists():
@@ -124,8 +123,6 @@ class SetItemStageAPI(APIView):
         item_to_order = ItemToOrder.objects.get(id=request.data['item_to_order_id'])
         product_stage_name = request.data['product_stage_id'].split('_')[0]
         product_stage_id = request.data['product_stage_id'].split('_')[1]
-        print(product_stage_name, product_stage_id)
-        print(item_to_order)
         stage = Stage.objects.get(id=product_stage_id, name=product_stage_name)
         item_to_order.set_stage(stage)
         return Response({'Result': 'OK'})
