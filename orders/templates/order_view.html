@@ -121,7 +121,7 @@ border: none;
                                     <td>{% if item_to_order.get_total_price %}{{ item_to_order.get_total_price|floatformat:2 }}{% else %}-{% endif %}</td>
                                     <td>{{ last_price|get_item:active_order.id|get_item:item_to_order.id|index:0 }} - {{ last_price|get_item:active_order.id|get_item:item_to_order.id|index:1 }}</td>
                                     <td>
-                                        <button class="btn btn-secondary" id="showAnalogs" name="{{ item_to_order.id }}">Выбрать аналог</button>
+                                        <button class="btn btn-secondary" id="showAnalogs" name="{{ item_to_order.id }}" onclick="Analogs(this, {{ item_to_order.id }})">Выбрать аналог</button>
                                     </td>
                                     <td>
                                         <button class="btn p-0" onclick="api_remove_item_from_order({{ item_to_order.id }})"><i class="fas fa-trash-alt fa-lg"></i></button>
