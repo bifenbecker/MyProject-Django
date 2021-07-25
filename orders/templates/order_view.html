@@ -105,7 +105,7 @@ border: none;
                                 <tr id="{{ item_to_order.item.id }}_item">
                                     <td>{{ item_to_order.item.id }}</td>
                                     <td>{{ item_to_order.item.name }}</td>
-                                    <td><select name="select_stage" id="stages" onchange="">
+                                    <td><select name="select_stage" onchange="">
                                         {% for stage in stages %}
                                             {% if stage.id == item_to_order.stage.id %}
                                             <option value="{{ stage.name }}_{{ stage.id }}" id="{{ item_to_order.id }}" selected>{{ stage.name }}</option>
@@ -121,7 +121,7 @@ border: none;
                                     <td>{% if item_to_order.get_total_price %}{{ item_to_order.get_total_price|floatformat:2 }}{% else %}-{% endif %}</td>
                                     <td>{{ last_price|get_item:active_order.id|get_item:item_to_order.id|index:0 }} - {{ last_price|get_item:active_order.id|get_item:item_to_order.id|index:1 }}</td>
                                     <td>
-                                        <button class="btn btn-secondary" id="showAnalogs" name="{{ item_to_order.id }}" onclick="Analogs(this, {{ item_to_order.id }})">Выбрать аналог</button>
+                                        <button class="btn btn-secondary" name="btn-choose-similar" id="showAnalogs" data-item-to-order-id="{{ item_to_order.id }}" data-item-id="{{ item_to_order.item.id }}">Выбрать аналог</button>
                                     </td>
                                     <td>
                                         <button class="btn p-0" onclick="api_remove_item_from_order({{ item_to_order.id }})"><i class="fas fa-trash-alt fa-lg"></i></button>
@@ -142,10 +142,6 @@ border: none;
            <a href="#close_window" class="close_window">X</a>
            
             <canvas id="chart" width="500" height="500"></canvas>
-        </window>
-        <window>
-           <a href="#close_window" class="close_window">X</a>
-            
         </window>
     </div>
 {% endblock %}
@@ -186,7 +182,7 @@ border: none;
             const csrftoken = getCookie('csrftoken');
             
             $.ajax({
-                url: 'http://127.0.0.1:8000/pilaru/orders/api/price_history',
+                url: '/pilaru/orders/api/price_history',
                 type: 'post',
                 data: { 'name': item_name, 'supplier': supplier_name },
                 headers: {

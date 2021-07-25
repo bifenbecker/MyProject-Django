@@ -447,27 +447,10 @@
 <script src="{% static '/js/pilaru.js' %}"></script>
 
 <script>
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-
-    const csrftoken = getCookie('csrftoken');
 
     function SelectOrder(project_name, order_id){
         $.ajax({
-            url: '/orders/api/set_active_order',
+            url: '/pilaru/orders/api/set_active_order',
             type: 'post',
             data: { 'project_name': project_name, 'set_active_order_id': order_id },
             headers: {

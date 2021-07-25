@@ -102,7 +102,7 @@
         var item_to_order_id = this['children'][0]['id'];
         $.ajax({
             // TODO:Need To change
-            url: 'http://127.0.0.1:8000/pilaru/items/api/set_stage',
+            url: '/pilaru/items/api/set_stage',
             type: 'post',
             data: { 'product_stage_id': product_stage_id, 'item_to_order_id': item_to_order_id },
             headers: {
