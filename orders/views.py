@@ -275,14 +275,13 @@ class PriceHistoryOrderAPI(APIView):
 
     def post(self, request):
         data = request.data
-        item_name = data['name']
-        item_supplier = data['supplier']
+        item_id = int(data['item_id'])
         orders = request.user.orders.all()
 
         data_of_item = {}
         for order in orders:
             for item_in_order in order.items_in_order.all():
-                if item_in_order.item.supplier.name == item_supplier and item_in_order.item.name == item_name:
+                if item_in_order.item.id == item_id:
                     date = str(item_in_order.created_date).split(".")[0]
                     try:
                         data_of_item[date] = float(item_in_order.price_offer.price_per_unit)

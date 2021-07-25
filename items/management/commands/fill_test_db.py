@@ -4,12 +4,20 @@ from django.contrib.auth import get_user_model
 from items.models import Supplier, ItemCategory, Item, Product
 from orders.models import Stage, OrderState, OrderStateToOrder, Order, PriceOffer, ItemToOrder
 from projects.models import *
-from datetime import datetime
+import datetime
 import random
 
 
 User = get_user_model()
 TEST_USER_CREDS = ('test@gmail.com', '12345678')
+
+
+def random_date(start, end):
+    """Generate a random datetime between `start` and `end`"""
+    return start + datetime.timedelta(
+        # Get a random amount of seconds between `start` and `end`
+        seconds=random.randint(0, int((end - start).total_seconds())),
+    )
 
 
 class Command(BaseCommand):
@@ -113,21 +121,21 @@ class Command(BaseCommand):
             all_projects.append(project)
 
         # === FILL ORDERS ===
-        items_for_test_orders = random.choices(all_items, k=30)
+        items_for_test_orders = random.choices(all_items, k=20)
         for _ in range(30):
             order = Order.objects.create(project=random.choice(all_projects), created_by=test_user)
             OrderStateToOrder.objects.create(
                 order=order,
                 state=order_states['Активный'],
-                finished_date=datetime.now()
+                finished_date=datetime.datetime.now()
             )
             OrderStateToOrder.objects.create(
                 order=order,
                 state=order_states['Завершен'],
             )
-            for item in random.choices(items_for_test_orders, k=random.randint(1, 30)):
+            for item in random.choices(items_for_test_orders, k=random.randint(1, 20)):
                 qty = random.randint(1, 50)
-                ItemToOrder.objects.create(
+                item_to_order = ItemToOrder.objects.get_or_create(
                     item=item,
                     order=order,
                     stage=random.choice(all_stages),
@@ -137,7 +145,10 @@ class Command(BaseCommand):
                         for_quantity=qty,
                         price_per_unit=random.randint(100, 999)/100.00
                     )
-                )
+                )[0]
+                dt = random_date(datetime.datetime.strptime('5/25/2021 1:30 PM', '%m/%d/%Y %I:%M %p'), datetime.datetime.now())
+                item_to_order.created_date = dt
+                item_to_order.save()
 
         test_user.active_order = order
         test_user.save()
