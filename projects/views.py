@@ -145,3 +145,24 @@ class InviteToProjectView(View):
             return redirect('project_detail_url', project_id=project.id)
         except:
             return redirect('search_url')
+
+
+class SupplierTableView(View):
+    template_name = 'supplier_table_view.html'
+
+    def get(self, request, *args, **kwargs):
+        order = Order.objects.get(id=kwargs.get('order_id'))
+        context_data = {}
+        for item_in_order in order.items_in_order.all():
+            if item_in_order.item.supplier.name not in context_data.keys():
+                context_data[item_in_order.item.supplier.name] = []
+                context_data[item_in_order.item.supplier.name].append(item_in_order)
+            else:
+                context_data[item_in_order.item.supplier.name].append(item_in_order)
+
+        context = {
+            'page_title': settings.PAGE_TITLE_PREFIX + 'Смета',
+            'toolbar_title': 'Смета по поставщикам',
+            'suppliers': context_data,
+        }
+        return render(request, self.template_name, context=context)

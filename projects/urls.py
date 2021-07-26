@@ -7,4 +7,5 @@ urlpatterns = [
     path('<int:project_id>', ProjectDetailView.as_view(), name='project_detail_url'),
     path('my-projects', ProjectListView.as_view(), name='project_list_url'),
     path('invite/<uuid:link_key>', InviteToProjectView.as_view(), name='invite_to_project_url'),
+    path('supplier-table/<int:order_id>', SupplierTableView.as_view(), name='supplier_table_url')
 ]

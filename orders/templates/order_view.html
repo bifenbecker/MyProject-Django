@@ -134,6 +134,7 @@ border: none;
                 </div>
             </div>
             <a href="{% url 'search_url' %}" class="btn btn-outline-secondary float-right" onclick="api_close_order({{ active_order.id }})">Закрыть заказ</a>
+            <a href="{% url 'supplier_table_url' order_id=active_order.id %}" class="btn btn-outline-secondary float-right">Смета поставщиков</a>
         </div>
     </div>
     {% endfor %}
