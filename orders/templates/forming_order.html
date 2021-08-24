@@ -1,0 +1,132 @@
+
+{% extends 'base.html' %}
+{% load get_item %}
+{% load index %}
+{% block custom_head %}
+
+    <!-- Custom styles for this page -->
+    <link href="/static/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+
+    {% for active_order in active_orders %}
+    <div class="row justify-content-center">
+        <div class="col-10">
+            <h5>Позиции в заказе номер {{ active_order.id }}:</h5>
+            <h5>Заказ с проекта - {{ active_order.project.name }}</h5>
+            {% if not active_order.is_empty %}
+            <div class="progress" style="margin-bottom: 10px;">
+                <div class="progress-bar progress-bar-striped" role="progressbar" style="width: {{ active_order.get_percent_stage }}%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">{{ active_order.get_order_stage_display }}</div>
+            </div>
+            {% endif %}
+            {% for product_in_order in active_order.products_in_order.all %}
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <h4>{{ product_in_order.product }}</h4>
+                        <table class="table table-bordered w-100" id="dataTable" cellspacing="0">
+                            <thead>
+                            <tr>
+                                <th>Номер</th>
+                                <th>Название</th>
+                                <th>Поставщик</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for item in product_in_order.product.items.all %}
+                                <tr>
+                                    <td>{{ item.id }}</td>
+                                    <td>{{ item.name }}</td>
+                                    <td>{{ item.supplier.name }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% if not active_order.is_empty %}
+            <a href="#" class="btn btn-outline-secondary float-right">Сформировать заказ</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+{% endblock %}
+
+{% block custom_script %}
+
+    <!-- Page level plugins -->
+    <script src="/static/vendor/datatables/jquery.dataTables.min.js"></script>
+    <script src="/static/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4"></script>
+    <script src="/static/js/pilaru.js"></script>
+    <script>
+
+
+        function setGraph(obj){
+            const data = {
+                        labels: Object.keys(obj['Data']),
+                        datasets: [{
+                            label: 'Цена',
+                            data: Object.values(obj['Data']),
+                            fill: true,
+                            borderColor: 'rgb(0, 204, 0)',
+                            backgroundColor: 'rgb(0, 102, 255, 0.5)',
+                            tension: 0.1
+                        }]
+            };
+            const config = {
+                type: 'line',
+                data: data,
+                options: {
+                    scales: {
+                        xAxes: [{
+                            ticks: {
+                                display: false
+                            }
+                        }]
+                    }
+                }
+            };
+            var ctx = document.getElementById("chart");
+            var chart = new Chart(ctx, config);
+        }
+
+        function showGraph(item_id){
+            location.hash ='show-graph'
+
+            const csrftoken = getCookie('csrftoken');
+            
+            $.ajax({
+                url: '/pilaru/orders/api/price_history',
+                type: 'post',
+                data: { 'item_id': item_id },
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                },
+                dataType: 'json',
+                success: function (obj) {
+                    setGraph(obj)
+                },
+                error: function (e) {
+                    alert('Ошибка запроса к серверу: ' + e.toString());
+                }
+            });    
+        }
+
+        $(document).ready(function() {
+            $('#dataTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Russian.json",
+                },
+                "paging": false,
+                "searching": false
+            });
+        });
+            
+    </script>
+
+    <!-- /.container-fluid -->
+{% endblock %}

@@ -6,6 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from projects.models import Project
 
 
+
 class User(AbstractUser):
 
     active_order = models.ForeignKey('orders.Order', on_delete=models.CASCADE, verbose_name='Активный заказ', null=True, default=None)

@@ -66,7 +66,7 @@
             </a>
             <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
-                    <a class="collapse-item" href="{% url 'order_view_url' %}">Текущие заказы</a>
+                    <a class="collapse-item" href="{% url 'forming-order_view_url' %}">Текущие заказы</a>
                     <a class="collapse-item" href="{% url 'history_order_view_url' %}">История заказов</a>
                 </div>
             </div>
@@ -184,7 +184,25 @@
                         </div>
                     </li>
 
+
                     {% if user.is_authenticated %}
+
+                    <li class="nav-item dropdown no-arrow mx-1">
+                        <a class="nav-link dropdown-toggle" href="#" id="FormingOrdersDropdown" role="button"
+                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-th-list"></i>
+                            <!-- Counter - Forming Orders -->
+                            <span class="badge badge-danger badge-counter">{{ user.forming_orders.all|length  }}</span>
+                        </a>
+                        <!-- Dropdown - Forming Orders -->
+                        <div id="ActiveFormigOrders" class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                             aria-labelledby="messagesDropdown">
+                            <h6 class="dropdown-header">
+                                Ваши несформированные заказы
+                            </h6>
+                        </div>
+                    </li>
+
                     <li class="nav-item dropdown no-arrow mx-1">
                         <a class="nav-link dropdown-toggle" href="#" id="ordersDropdown" role="button"
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

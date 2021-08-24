@@ -7,8 +7,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 
-from items.models import Item
-from .models import Order, Stage, ItemToOrder, OrderState, OrderStateToOrder, PriceOffer
+from items.models import Item, Product
+from .models import Order, Stage, ItemToOrder, OrderState, OrderStateToOrder, PriceOffer, ProductToOrder
 
 import random
 from decimal import Decimal
@@ -100,6 +100,28 @@ class OrderView(View):
             return render(request, 'order_view__no_active.html', context=context)
 
 
+class FormingOrderView(View):
+    template_name = "forming_order.html"
+
+    @is_auth
+    def get(self, request):
+        context = {
+            'page_title': settings.PAGE_TITLE_PREFIX + 'Текущие заказы',
+            'toolbar_title': 'Текущие заказы с проектов'
+        }
+        active_orders_by_projects = []
+        for member in request.user.member_in_projects.all():
+            if member.project.get_active_order():
+                active_orders_by_projects.append(member.project.get_active_order())
+
+        if len(active_orders_by_projects) != 0:
+            context['active_orders'] = active_orders_by_projects
+            return render(request, self.template_name, context=context)
+        else:
+            return render(request, 'order_view__no_active.html', context=context)
+
+
+
 class HistoryOrderView(View):
     template_name = 'history_order_view.html'
 
@@ -148,36 +170,32 @@ class HistoryOrderDetailView(View):
 # region API
 class AddToOrderAPIView(APIView):
     """
-    Добавление товара в заказ
+    Добавление продукта в заказ
     """
     def post(self, request):
         """
-        POST запрос 'domain/orders/api/add_item_to_order'
+        POST запрос 'domain/orders/api/add_product_to_order'
         Ключи словаря
-        item_id = ID товара
-        quantity = Количество товара
+        product_id = ID продукта
         """
 
         try:
             data = request.data
-            quantity = int(data['quantity'])
             user = request.user
-            item_id = int(data['item_id'])
+            product_id = int(data['product_id'])
 
             try:
-                item = Item.objects.get(id=item_id)
+                product = Product.objects.get(id=product_id)
             except ObjectDoesNotExist:
                 raise Exception("Товар не найден")
 
             # Order
             order = user.active_order
+            if order is None:
+                order = user.get_active_order()
             # Create order if does not exists
             # TODO: Need to check on bugs
             if order is None:
-                # if len(user.member_in_projects.all()) == 0:
-                #     redirect('create_project_url')
-                #     return Response({'error': 'Create'})
-
                 active_project = user.get_active_project()
                 if active_project is None:
                     return Response({'result': 'Создайте или вступите в проект'})
@@ -186,24 +204,16 @@ class AddToOrderAPIView(APIView):
                 order_state = OrderState.objects.get(name='Активный')
                 OrderStateToOrder.objects.create(order=order, state=order_state)
 
-            item_to_order = ItemToOrder.objects.filter(item=item, order=order).first()
+            product_to_order = ProductToOrder.objects.filter(product=product, order=order).first()
 
-            if item_to_order:
-                item_to_order.quantity += quantity
-                item_to_order.save()
+            if product_to_order:
+                product_to_order.save()
             else:
-                item_to_order = ItemToOrder.objects.create(
-                    item=item,
+                product_to_order = ProductToOrder.objects.create(
+                    product=product,
                     order=order,
-                    quantity=quantity,
-                    stage=Stage.objects.all()[0]
                 )
-                item_to_order.price_offer = PriceOffer.objects.get_or_create(
-                    item=item,
-                    for_quantity=random.randint(10, 50),
-                    price_per_unit=Decimal(random.randrange(1, 200, 1)),
-                )[0]
-                item_to_order.save()
+                product_to_order.save()
 
 
             return Response({'result': 'ok'})

@@ -15,8 +15,9 @@
             <p>Номер позиции: П{{ product.id }}</p>
             <p>Категория: {{ product.category }}</p>
             <p>Единица измерения: {{ product.get_unit_measurement_display }}</p>
-
+            <button class="btn btn-primary" onclick="api_add_item_to_order({{ product.id }})">Добавить продукт в заказ</button>
             <h5 class="mt-5">Предложения:</h5>
+
             <div class="card shadow mb-4">
                 <div class="card-body">
                     <div class="table-responsive">
@@ -29,7 +30,6 @@
                                 <th>Ед. измерения</th>
                                 <th>Дата добавления</th>
                                 <th>Кол-во</th>
-                                <th></th>
                             </tr>
                             </thead>
                             <tbody>
@@ -41,13 +41,13 @@
                                     <td>{{ item.get_unit_measurement_display }}</td>
                                     <td>{{ item.created_date }}</td>
                                     <td><input class="form-control" type="number" name="item_qty" min="1" step="1" value="1"></td>
-                                    <td>
-                                        <button class="btn p-0" onclick="api_add_item_to_order(this, {{ item.id }})">
-                                            <span class="badged-cart-wrap fa-stack fa-2x has-badge" data-count="{{ item|get_items_qty_in_order:active_order }}">
-                                                <i class="badged-cart fas fa-cart-plus fa-stack-1x xfa-inverse fa-xs"></i>
-                                            </span>
-                                        </button>
-                                    </td>
+<!--                                    <td>-->
+<!--                                        <button class="btn p-0" onclick="api_add_item_to_order(this, {{ item.id }})">-->
+<!--                                            <span class="badged-cart-wrap fa-stack fa-2x has-badge" data-count="{{ item|get_items_qty_in_order:active_order }}">-->
+<!--                                                <i class="badged-cart fas fa-cart-plus fa-stack-1x xfa-inverse fa-xs"></i>-->
+<!--                                            </span>-->
+<!--                                        </button>-->
+<!--                                    </td>-->
                                 </tr>
                             {% endfor %}
                             </tbody>
@@ -69,7 +69,6 @@
                                 <th>Поставщик</th>
                                 <th>Ед. измерения</th>
                                 <th>Кол-во</th>
-                                <th></th>
                             </tr>
                             </thead>
                             <tbody>
@@ -98,13 +97,13 @@
                                         <td>{{ similar_item.supplier }}</td>
                                         <td>{{ similar_item.get_unit_measurement_display }}</td>
                                         <td><input class="form-control" type="number" name="item_qty" min="1" step="1" value="1"></td>
-                                        <td>
-                                            <button class="btn p-0" onclick="api_add_item_to_order(this, {{ similar_item.id }})">
-                                                <span class="badged-cart-wrap fa-stack fa-2x has-badge" data-count="{{ similar_item|get_items_qty_in_order:active_order }}">
-                                                    <i class="badged-cart fas fa-cart-plus fa-stack-1x xfa-inverse fa-xs"></i>
-                                                </span>
-                                            </button>
-                                        </td>
+<!--                                        <td>-->
+<!--                                            <button class="btn p-0" onclick="api_add_item_to_order(this, {{ similar_item.id }})">-->
+<!--                                                <span class="badged-cart-wrap fa-stack fa-2x has-badge" data-count="{{ similar_item|get_items_qty_in_order:active_order }}">-->
+<!--                                                    <i class="badged-cart fas fa-cart-plus fa-stack-1x xfa-inverse fa-xs"></i>-->
+<!--                                                </span>-->
+<!--                                            </button>-->
+<!--                                        </td>-->
                                     </tr>
                                 {%  empty %}
                                     <tr>

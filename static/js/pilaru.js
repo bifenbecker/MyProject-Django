@@ -20,16 +20,44 @@ const csrftoken = getCookie('csrftoken');
 const API_URL_PREFIX = '/pilaru';
 
 
-function api_add_item_to_order(btn, item_id) {
-    let $btn = $(btn)
-    let $span = $btn.find('span');
+// function api_add_item_to_order(btn, item_id) {
+//     let $btn = $(btn)
+//     let $span = $btn.find('span');
 
-    let qty = parseInt($btn.parent().parent().find('input[name="item_qty"]')[0].value);
+//     let qty = parseInt($btn.parent().parent().find('input[name="item_qty"]')[0].value);
 
+//     $.ajax({
+//         url: API_URL_PREFIX + '/orders/api/add_item_to_order',
+//         type: 'post',
+//         data: { 'item_id': item_id, 'quantity': qty },
+//         headers: {
+//             'X-CSRFToken': csrftoken,
+//         },
+//         dataType: 'json',
+//         success: function (data) {
+//             if (data['result'] !== 'ok'){
+//                 alert(data['result'])
+//             }else{
+//                 let current_qty = parseInt($span.attr('data-count'));
+//                 if (isNaN(current_qty)) {
+//                     current_qty = 0;
+//                 }
+//                 $span.attr('data-count', current_qty + qty);
+//             }
+
+//         },
+//         error: function (e) {
+//             alert('Ошибка запроса к серверу: ' + e.toString());
+//         }
+//     });
+// }
+
+
+function api_add_item_to_order(product_id) {
     $.ajax({
-        url: API_URL_PREFIX + '/orders/api/add_item_to_order',
+        url: API_URL_PREFIX + '/orders/api/add_product_to_order',
         type: 'post',
-        data: { 'item_id': item_id, 'quantity': qty },
+        data: { 'product_id': product_id },
         headers: {
             'X-CSRFToken': csrftoken,
         },

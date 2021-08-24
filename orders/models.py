@@ -28,8 +28,16 @@ class OrderState(models.Model):
         verbose_name_plural = 'Статусы заказа'
 
 
+STAGE_ORDER_CHOICES = (
+    (1, 'формирование заказа'),
+    (2, 'Запрос цены у поставщиков'),
+    (3, 'Выбор предложений у поставщиков'),
+    (4, 'Отправка заказа поставщикам')
+)
+
 class Order(models.Model):
     project = models.ForeignKey('projects.Project', on_delete=models.CASCADE, related_name='orders_in_project', null=True)
+    order_stage = models.PositiveSmallIntegerField(choices=STAGE_ORDER_CHOICES, verbose_name='Этап формирования', default=STAGE_ORDER_CHOICES[0])
     created_by = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='orders', verbose_name='Создатель')
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
 
@@ -42,6 +50,12 @@ class Order(models.Model):
             order_state_to_order.finished_date = datetime.now()
             order_state_to_order.save()
         OrderStateToOrder.objects.create(order=self, state=new_order_state)
+
+    def get_percent_stage(self):
+        return self.order_stage * 25
+
+    def is_empty(self):
+        return len(self.products_in_order.all()) == 0
 
     def __str__(self):
         return str(self.created_by)
@@ -81,6 +95,7 @@ class Stage(models.Model):
 class ItemToOrder(models.Model):
     item = models.ForeignKey('items.Item', on_delete=models.CASCADE, related_name="orders", verbose_name="Товар")
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items_in_order', verbose_name='Заказ')
+    selected = models.BooleanField(verbose_name="Выбран", default=False)
     stage = models.ForeignKey(Stage, on_delete=models.PROTECT, related_name='+', null=True, blank=True, verbose_name='Этап')
     quantity = models.PositiveIntegerField(verbose_name='Количество')
     price_offer = models.OneToOneField(PriceOffer, on_delete=models.PROTECT, blank=True, null=True, verbose_name='Предложение цены')
@@ -103,3 +118,17 @@ class ItemToOrder(models.Model):
         ordering = ['id']
         verbose_name = 'Товар в заказе'
         verbose_name_plural = 'Товары в заказе'
+
+
+class ProductToOrder(models.Model):
+    product = models.ForeignKey('items.Product', on_delete=models.CASCADE, related_name="product_orders", verbose_name="Продукт")
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='products_in_order', verbose_name='Заказ', null=True, default=None)
+    created_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+
+    def __str__(self):
+        return self.product.name
+
+    class Meta:
+        ordering = ['id']
+        verbose_name = 'Продукт в заказе'
+        verbose_name_plural = 'Продукты в заказе'

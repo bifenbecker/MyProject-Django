@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand
 from django.db.models.deletion import ProtectedError
 from django.contrib.auth import get_user_model
 from items.models import Supplier, ItemCategory, Item, Product
-from orders.models import Stage, OrderState, OrderStateToOrder, Order, PriceOffer, ItemToOrder
+from orders.models import Stage, OrderState, OrderStateToOrder, Order, PriceOffer, ItemToOrder, ProductToOrder
 from projects.models import *
 import datetime
 import random
@@ -25,6 +25,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # === CLEAN ===
+        ProductToOrder.objects.all().delete()
         ItemToOrder.objects.all().delete()
         Item.objects.all().delete()
         Supplier.objects.all().delete()
