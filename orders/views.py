@@ -40,7 +40,7 @@ def find_last_item_price_and_supplier_in_orders(item: ItemToOrder, orders: list)
             if item_in_order.item.supplier.name == item.item.supplier.name and item_in_order.item.name == item.item.name:
                 return (float(item_in_order.price_offer.price_per_unit), item_in_order.item.supplier.name)
 
-    return 0.0
+    return ("-", "-")
 
 
 def get_last_price_by_order(user, order):
@@ -53,10 +53,14 @@ def get_last_price_by_order(user, order):
                 item_in_active_order,
                 history_order_by_user)
     except ObjectDoesNotExist as e:
-        for item_in_active_order in order.items_in_order.all():
-            last_price[item_in_active_order.id] = (str(e), '')
+        # TODO: Need to check
+        # for item_in_active_order in order.items_in_order.all():
+        #     last_price[item_in_active_order.id] = (str(e), '')
+        for product_in_order in order.products_in_order.all():
+            for item in product_in_order.product.items.all():
+                last_price[item.id] = (str(e), '')
 
-    return last_price
+    return last_price if last_price else None
 
 
 def is_auth(func):
@@ -114,8 +118,15 @@ class FormingOrderView(View):
             if member.project.get_active_order():
                 active_orders_by_projects.append(member.project.get_active_order())
 
+        last_price_orders = {}
+        if len(active_orders_by_projects) != 0:
+            for order in active_orders_by_projects:
+                last_price_orders.update({order.id: get_last_price_by_order(request.user, order)})
+
         if len(active_orders_by_projects) != 0:
             context['active_orders'] = active_orders_by_projects
+            context['last_price'] = last_price_orders
+            context['stages'] = Stage.objects.all()
             return render(request, self.template_name, context=context)
         else:
             return render(request, 'order_view__no_active.html', context=context)

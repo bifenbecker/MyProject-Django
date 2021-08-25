@@ -82,7 +82,6 @@ function api_add_item_to_order(product_id) {
 
 
 function api_remove_item_from_order(item_to_order_id) {
-    console.log(item_to_order_id);
     $.ajax({
         url: API_URL_PREFIX + '/orders/api/remove_item_from_order',
         type: 'post',
@@ -212,4 +211,25 @@ $(document).on('click', 'button[name="btn-choose-similar"]', function () {
             }
         });
     }
+});
+
+
+$(document).on('change', 'input[name="select-item"]', function () {
+    console.log(this)
+    // $.ajax({
+    //     // TODO:Need To change
+    //     url: '/pilaru/items/api/get_similar',
+    //     type: 'get',
+    //     data: { 'item_to_order_item_id': item_to_order_item_id },
+    //     headers: {
+    //         'X-CSRFToken': csrftoken,
+    //     },
+    //     dataType: 'json',
+    //     success: function (data) {
+
+    //     },
+    //     error: function (e) {
+    //         alert('Ошибка запроса к серверу: ' + e['error']);
+    //     }
+    // });
 });

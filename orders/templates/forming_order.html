@@ -24,21 +24,63 @@
             <div class="card shadow mb-4">
                 <div class="card-body">
                     <div class="table-responsive">
-                        <h4>{{ product_in_order.product }}</h4>
+                        <h4><a href="{% url 'product_details_url' product_id=product_in_order.product.id %}">{{ product_in_order.product }}</a></h4>
+                        <table class="table table-bordered w-100" id="dataTable" cellspacing="0">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                <th>Номер</th>
+                                <th>Название</th>
+                                <th>Этап</th>
+                                <th>Поставщик</th>
+                                <th>Ед. измерения</th>
+                                <th>Кол-во</th>
+                                <th>Цена за единицу</th>
+                                <th>Последняя цена - Поставщик</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for item_to_order in product_in_order.product.items.all %}
+                                <tr>
+                                    <td><input type="checkbox" item-to-order-id="{{ item_to_order.id }}" name="select-item"></td>
+                                    <td>{{ item_to_order.id }}</td>
+                                    <td>{{ item_to_order.name }}</td>
+                                    <td><select name="select_stage" onchange="">
+                                        {% for stage in stages %}
+                                            {% if stage.id == item_to_order.stage.id %}
+                                            <option value="{{ stage.name }}_{{ stage.id }}" id="{{ item_to_order.id }}" selected>{{ stage.name }}</option>
+                                            {% else %}
+                                            <option value="{{ stage.name }}_{{ stage.id }}" id="{{ item_to_order.id }}">{{ stage.name }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select></td>
+                                    <td>{{ item_to_order.supplier.name }}</td>
+                                    <td>{{ item_to_order.get_unit_measurement_display }}</td>
+                                    <td><input class="form-control" type="number" name="item_qty" min="1" step="1" value="{{ item_to_order.quantity }}" onchange="api_change_item_qty_in_order(this, {{ item_to_order.id }})"></td>
+                                    <td>{% if item_to_order.get_total_price %}{{ item_to_order.get_total_price|floatformat:2 }}{% else %}-{% endif %}</td>
+                                    <td>{{ last_price|get_item:active_order.id|get_item:item_to_order.id|index:0 }} - {{ last_price|get_item:active_order.id|get_item:item_to_order.id|index:1 }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+
+                        <h4>Аналог{% if product_in_order.product.similar.all|length > 1%}и({{ product_in_order.product.similar.all|length }}){% endif %} {{ product_in_order.product }}</h4>
                         <table class="table table-bordered w-100" id="dataTable" cellspacing="0">
                             <thead>
                             <tr>
                                 <th>Номер</th>
                                 <th>Название</th>
-                                <th>Поставщик</th>
+                                <th></th>
                             </tr>
                             </thead>
                             <tbody>
-                            {% for item in product_in_order.product.items.all %}
+                            {% for similar in product_in_order.product.similar.all %}
                                 <tr>
-                                    <td>{{ item.id }}</td>
-                                    <td>{{ item.name }}</td>
-                                    <td>{{ item.supplier.name }}</td>
+                                    <td><a href="{% url 'product_details_url' product_id=similar.id %}">{{ similar.id }}</a></td>
+                                    <td>{{ similar.name }}</td>
+                                    <td>
+                                        <button class="btn btn-info">Заменить</button>
+                                    </td>
                                 </tr>
                             {% endfor %}
                             </tbody>
