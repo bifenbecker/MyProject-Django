@@ -1,5 +1,5 @@
 from items.models import *
-from orders.models import Order, ItemToOrder, Stage
+from orders.models import Order, ItemToOrder, Stage, ProductToOrder
 from .serializer import *
 
 from django.views.generic.base import TemplateView
@@ -117,14 +117,30 @@ class SearchItemsAPI(APIView):
             return Response({'Result': str(e)})
 
 
-class SetItemStageAPI(APIView):
+class SetProductStageAPI(APIView):
 
     def post(self, request):
-        item_to_order = ItemToOrder.objects.get(id=request.data['item_to_order_id'])
+        """
+        Изменение этапа у продукта в заказе
+        /pilaru/items/api/set_stage
+        :param request:
+        product_to_order_id - ID продукта
+        product_stage_id - ID этапа
+        :return:
+        """
+        try:
+            product_to_order = ProductToOrder.objects.get(id=request.data['product_to_order_id'])
+        except:
+            raise Exception("Такого продукта не существует")
+
         product_stage_name = request.data['product_stage_id'].split('_')[0]
         product_stage_id = request.data['product_stage_id'].split('_')[1]
-        stage = Stage.objects.get(id=product_stage_id, name=product_stage_name)
-        item_to_order.set_stage(stage)
+        try:
+            stage = Stage.objects.get(id=product_stage_id, name=product_stage_name)
+        except:
+            raise Exception("Такого этапа не существует")
+
+        product_to_order.set_stage(stage)
         return Response({'Result': 'OK'})
 
 

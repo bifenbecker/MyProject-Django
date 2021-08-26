@@ -96,7 +96,6 @@ class ItemToOrder(models.Model):
     item = models.ForeignKey('items.Item', on_delete=models.CASCADE, related_name="orders", verbose_name="Товар")
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items_in_order', verbose_name='Заказ')
     selected = models.BooleanField(verbose_name="Выбран", default=False)
-    stage = models.ForeignKey(Stage, on_delete=models.PROTECT, related_name='+', null=True, blank=True, verbose_name='Этап')
     quantity = models.PositiveIntegerField(verbose_name='Количество')
     price_offer = models.OneToOneField(PriceOffer, on_delete=models.PROTECT, blank=True, null=True, verbose_name='Предложение цены')
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
@@ -123,10 +122,16 @@ class ItemToOrder(models.Model):
 class ProductToOrder(models.Model):
     product = models.ForeignKey('items.Product', on_delete=models.CASCADE, related_name="product_orders", verbose_name="Продукт")
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='products_in_order', verbose_name='Заказ', null=True, default=None)
+    stage = models.ForeignKey(Stage, on_delete=models.PROTECT, related_name='+', null=True, blank=True,
+                              verbose_name='Этап')
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
 
     def __str__(self):
         return self.product.name
+
+    def set_stage(self, stage: Stage):
+        self.stage = stage
+        self.save()
 
     class Meta:
         ordering = ['id']

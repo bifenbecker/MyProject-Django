@@ -153,14 +153,13 @@ function filterElements(element){
 }
 
 $(document.body).on("change", 'select[name="select_stage"]', function(){
-    console.log(1);
     var product_stage_id = this.value;
-    var item_to_order_id = this['children'][0]['id'];
+    var product_to_order_id = this['children'][0]['id'];
     $.ajax({
         // TODO:Need To change
         url: '/pilaru/items/api/set_stage',
         type: 'post',
-        data: { 'product_stage_id': product_stage_id, 'item_to_order_id': item_to_order_id },
+        data: { 'product_stage_id': product_stage_id, 'product_to_order_id': product_to_order_id },
         headers: {
             'X-CSRFToken': csrftoken,
         },
@@ -233,3 +232,13 @@ $(document).on('change', 'input[name="select-item"]', function () {
     //     }
     // });
 });
+
+
+
+
+var myModal = document.getElementById('myModal')
+var myInput = document.getElementById('myInput')
+
+myModal.addEventListener('shown.bs.modal', function () { 
+  myInput.focus()
+})

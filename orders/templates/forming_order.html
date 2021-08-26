@@ -6,6 +6,7 @@
 
     <!-- Custom styles for this page -->
     <link href="/static/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
+
 {% endblock %}
 
 {% block content %}
@@ -19,82 +20,147 @@
             <div class="progress" style="margin-bottom: 10px;">
                 <div class="progress-bar progress-bar-striped" role="progressbar" style="width: {{ active_order.get_percent_stage }}%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">{{ active_order.get_order_stage_display }}</div>
             </div>
-            {% endif %}
-            {% for product_in_order in active_order.products_in_order.all %}
+
             <div class="card shadow mb-4">
                 <div class="card-body">
                     <div class="table-responsive">
-                        <h4><a href="{% url 'product_details_url' product_id=product_in_order.product.id %}">{{ product_in_order.product }}</a></h4>
                         <table class="table table-bordered w-100" id="dataTable" cellspacing="0">
-                            <thead>
-                            <tr>
-                                <th></th>
-                                <th>Номер</th>
-                                <th>Название</th>
-                                <th>Этап</th>
-                                <th>Поставщик</th>
-                                <th>Ед. измерения</th>
-                                <th>Кол-во</th>
-                                <th>Цена за единицу</th>
-                                <th>Последняя цена - Поставщик</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for item_to_order in product_in_order.product.items.all %}
-                                <tr>
-                                    <td><input type="checkbox" item-to-order-id="{{ item_to_order.id }}" name="select-item"></td>
-                                    <td>{{ item_to_order.id }}</td>
-                                    <td>{{ item_to_order.name }}</td>
-                                    <td><select name="select_stage" onchange="">
-                                        {% for stage in stages %}
-                                            {% if stage.id == item_to_order.stage.id %}
-                                            <option value="{{ stage.name }}_{{ stage.id }}" id="{{ item_to_order.id }}" selected>{{ stage.name }}</option>
-                                            {% else %}
-                                            <option value="{{ stage.name }}_{{ stage.id }}" id="{{ item_to_order.id }}">{{ stage.name }}</option>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </select></td>
-                                    <td>{{ item_to_order.supplier.name }}</td>
-                                    <td>{{ item_to_order.get_unit_measurement_display }}</td>
-                                    <td><input class="form-control" type="number" name="item_qty" min="1" step="1" value="{{ item_to_order.quantity }}" onchange="api_change_item_qty_in_order(this, {{ item_to_order.id }})"></td>
-                                    <td>{% if item_to_order.get_total_price %}{{ item_to_order.get_total_price|floatformat:2 }}{% else %}-{% endif %}</td>
-                                    <td>{{ last_price|get_item:active_order.id|get_item:item_to_order.id|index:0 }} - {{ last_price|get_item:active_order.id|get_item:item_to_order.id|index:1 }}</td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
+                                    <thead>
+                                    <tr>
+                                        <th>Название</th>
+                                        <th>Этап</th>
+                                        <th>Аналоги</th>
+                                        <th>Поставщики</th>
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for product_in_order in active_order.products_in_order.all %}
+                                    <tr>
+                                        <td><a href="{% url 'product_details_url' product_id=product_in_order.product.id %}" style="text-decoration: none; ">{{ product_in_order.product }}</a></td>
+                                        <td>
+                                            <select name="select_stage" onchange="" style="margin-bottom: 10px; display: block;">
+                                                {% for stage in stages %}
+                                                    {% if stage.id == product_in_order.stage.id %}
+                                                    <option value="{{ stage.name }}_{{ stage.id }}" id="{{ product_in_order.id }}" selected>{{ stage.name }}</option>
+                                                    {% else %}
+                                                    <option value="{{ stage.name }}_{{ stage.id }}" id="{{ product_in_order.id }}">{{ stage.name }}</option>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <button data-item-id="{{ product_in_order.id }}" type="button" class="btn btn-primary" data-toggle="modal" data-target="#Analogs" style="display: inline-block; margin: 10px;">Показать аналог{% if product_in_order.product.similar.all|length > 1%}и({{ product_in_order.product.similar.all|length }}){% endif %}</button>
+                                        </td>
+                                        <td>
+                                            <button data-item-id="{{ product_in_order.id }}" type="button" class="btn btn-primary" data-toggle="modal" data-target="#Items" style="display: inline-block; margin: 10px;">Показать поставщик{% if product_in_order.product.items.all|length > 1%}ов({{ product_in_order.product.items.all|length }}){% else %}а{% endif %}</button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    </tbody>
                         </table>
 
-                        <h4>Аналог{% if product_in_order.product.similar.all|length > 1%}и({{ product_in_order.product.similar.all|length }}){% endif %} {{ product_in_order.product }}</h4>
-                        <table class="table table-bordered w-100" id="dataTable" cellspacing="0">
-                            <thead>
-                            <tr>
-                                <th>Номер</th>
-                                <th>Название</th>
-                                <th></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for similar in product_in_order.product.similar.all %}
-                                <tr>
-                                    <td><a href="{% url 'product_details_url' product_id=similar.id %}">{{ similar.id }}</a></td>
-                                    <td>{{ similar.name }}</td>
-                                    <td>
-                                        <button class="btn btn-info">Заменить</button>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
+                        <div class="modal fade" id="Items" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Товары от поставщиков</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body">
+                                  <h2>{{ product_in_order }}</h2>
+                                <table class="table table-bordered w-100" id="dataTable" cellspacing="0">
+                                    <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th>Номер</th>
+                                        <th>Название</th>
+                                        <th>Поставщик</th>
+                                        <th>Ед. измерения</th>
+                                        <th>Кол-во</th>
+                                        <th>Цена за единицу</th>
+                                        <th>Последняя цена - Поставщик</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for item_to_order in product_in_order.product.items.all %}
+                                        <tr>
+                                            <td>
+                                                <div class="form-check">
+                                                  <input style="width: auto; height: auto;" item-to-order-id="{{ item_to_order.id }}" name="select-item" class="form-check-input" type="checkbox" value="" id="flexCheckDefault" disabled>
+                                                </div>
+                                            </td>
+                                            <td>{{ item_to_order.id }}</td>
+                                            <td>{{ item_to_order.name }}</td>
+                                            <td>{{ item_to_order.supplier.name }}</td>
+                                            <td>{{ item_to_order.get_unit_measurement_display }}</td>
+                                            <td><input class="form-control" type="number" name="item_qty" min="1" step="1" value="{{ item_to_order.quantity }}" onchange="api_change_item_qty_in_order(this, {{ item_to_order.id }})"></td>
+                                            <td>{% if item_to_order.get_total_price %}{{ item_to_order.get_total_price|floatformat:2 }}{% else %}-{% endif %}</td>
+                                            <td>{{ last_price|get_item:active_order.id|get_item:item_to_order.id|index:0 }} - {{ last_price|get_item:active_order.id|get_item:item_to_order.id|index:1 }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                                <button type="button" class="btn btn-primary">Сохранить</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="modal fade" id="Analogs" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                          <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Аналог{% if product_in_order.product.similar.all|length > 1%}и({{ product_in_order.product.similar.all|length }}){% endif %}</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body">
+                                  <h2>{{ product_in_order }}</h2>
+                                <table class="table table-bordered w-100" id="dataTable" cellspacing="0">
+                                    <thead>
+                                    <tr>
+                                        <th>Номер</th>
+                                        <th>Название</th>
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for similar in product_in_order.product.similar.all %}
+                                        <tr>
+                                            <td><a href="{% url 'product_details_url' product_id=similar.id %}" style="text-decoration: none; ">{{ similar.id }}</a></td>
+                                            <td>{{ similar.name }}</td>
+                                            <td><button>Заменить</button></td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                                <button type="button" class="btn btn-primary">Сохранить</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
-            {% endfor %}
-            {% if not active_order.is_empty %}
             <a href="#" class="btn btn-outline-secondary float-right">Сформировать заказ</a>
+            {% else %}
+            <h2>Пусто</h2>
             {% endif %}
         </div>
     </div>
     {% endfor %}
+
 {% endblock %}
 
 {% block custom_script %}
