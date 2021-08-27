@@ -59,11 +59,18 @@ class ProductDetailsView(TemplateView):
 
     def get_context_data(self, **kwargs):
         product = get_object_or_404(Product, id=kwargs['product_id'])
+        active_order = self.request.user.active_order
+        is_in_order = False
+        for product_in_order in active_order.products_in_order.all():
+            if product_in_order.product.id == product.id:
+                is_in_order = True
+                break
         return {
             'page_title': settings.PAGE_TITLE_PREFIX + product.name,
             'toolbar_title': product.name,
             'product': product,
-            'active_order': self.request.user.get_active_order()
+            'active_order': active_order,
+            'is_in_order': is_in_order,
         }
 
 

@@ -56,9 +56,12 @@ def get_last_price_by_order(user, order):
         # TODO: Need to check
         # for item_in_active_order in order.items_in_order.all():
         #     last_price[item_in_active_order.id] = (str(e), '')
+        # for product_in_order in order.products_in_order.all():
+        #     for item in product_in_order.product.items.all():
+        #         last_price[item.id] = (str(e), '')
         for product_in_order in order.products_in_order.all():
             for item in product_in_order.product.items.all():
-                last_price[item.id] = (str(e), '')
+                last_price[item.id] = None
 
     return last_price if last_price else None
 
@@ -122,6 +125,25 @@ class FormingOrderView(View):
         if len(active_orders_by_projects) != 0:
             for order in active_orders_by_projects:
                 last_price_orders.update({order.id: get_last_price_by_order(request.user, order)})
+                if order.order_stage > 1:
+                    for product in order.products_in_order.all():
+                        min_price = 0
+                        best_items = []
+                        for item in order.items_in_order.all():
+                            if item.item.product == product.product:
+                                if len(best_items) == 0:
+                                    min_price = item.price_offer.price_per_unit
+                                    best_items.append(item)
+
+                                if item.price_offer.price_per_unit < min_price:
+                                    min_price = item.price_offer.price_per_unit
+                                    best_items = [item]
+                                elif item.price_offer.price_per_unit == min_price:
+                                    min_price = item.price_offer.price_per_unit
+                                    best_items.append(item)
+
+                        for best in best_items:
+                            best.select()
 
         if len(active_orders_by_projects) != 0:
             context['active_orders'] = active_orders_by_projects
@@ -232,13 +254,12 @@ class AddToOrderAPIView(APIView):
             return Response('error', status=500)
 
 
-class RemoveFromOrderAPIView(APIView):
+class RemoveItemFromOrderAPIView(APIView):
 
     def post(self, request):
         try:
             data = request.data
             item_to_order_id = data['item_to_order_id']
-
             try:
                 item_to_order = ItemToOrder.objects.get(id=item_to_order_id)
             except ObjectDoesNotExist:
@@ -248,6 +269,23 @@ class RemoveFromOrderAPIView(APIView):
             return Response({'result': 'ok'})
         except Exception as e:
             print(e)
+            return Response('error', status=500)
+
+
+class RemoveProductFromOrderAPIView(APIView):
+
+    def post(self, request):
+        try:
+            data = request.data
+            product_to_order_id = data['product_to_order_id']
+            try:
+                product_to_order = ProductToOrder.objects.get(id=product_to_order_id)
+            except ObjectDoesNotExist:
+                raise Exception("Продукт не найден")
+            product_to_order.delete()
+
+            return Response({'result': 'ok'})
+        except Exception as e:
             return Response('error', status=500)
 
 
@@ -269,6 +307,26 @@ class ChangeItemQuantityInOrderAPIView(APIView):
             return Response({'result': 'ok'})
         except Exception as e:
             print(e)
+            return Response('error', status=500)
+
+
+class ChangeProductQuantityInOrderAPIView(APIView):
+
+    def post(self, request):
+        try:
+            data = request.data
+            product_to_order_id = data['product_to_order_id']
+            new_quantity = int(data['quantity'])
+
+            try:
+                product_to_order = ProductToOrder.objects.get(id=product_to_order_id)
+            except ObjectDoesNotExist:
+                raise Response({'error': "Продукт не найден"})
+            product_to_order.quantity = new_quantity
+            product_to_order.save()
+
+            return Response({'result': 'ok'})
+        except Exception as e:
             return Response('error', status=500)
 
 
@@ -328,4 +386,58 @@ class SetActiveOrderAPI(APIView):
                 orders['non-active'].append(active_order_in_project.id)
 
         return Response(orders)
+
+
+class SendMessageToSuppliers(APIView):
+    """
+    API запроса цены у поставщиков
+    """
+    def post(self, request):
+        """
+        /orders/api/send_message_to_suppliers
+        :param request:
+        order_id: ID Заказа
+        qtn_data: Количество
+        :return:
+        """
+        import json
+
+        # TODO: Need to change random price to send request to suppliers
+        data = request.data
+        order_id = data['order_id']
+        qtn_data = json.loads(data['qtn_data'])
+
+        order = Order.objects.get(id=order_id)
+
+        if order.order_stage == 1:
+            try:
+                for product_in_order in order.products_in_order.all():
+                    for item_in_order in product_in_order.product.items.all():
+                        # TODO: send request
+
+                        price_offer = PriceOffer.objects.create(
+                            item=item_in_order,
+                            for_quantity=qtn_data[str(item_in_order.id)],
+                            price_per_unit=random.randint(100, 1000)
+                        )
+
+                        item_to_order = ItemToOrder.objects.create(
+                            item=item_in_order,
+                            order=order,
+                            quantity=qtn_data[str(item_in_order.id)],
+                            price_offer=price_offer
+                        )
+
+
+            except:
+                return Response({'error': "Не удалось отправить запрос"})
+
+            try:
+                order.set_stage(2)
+            except Exception as e:
+                raise Exception(str(e))
+
+            return Response({'Result': 'Ok'})
+        else:
+            return Response({'error': "У Вас уже отправлен запрос на этот заказ"})
 # endregion

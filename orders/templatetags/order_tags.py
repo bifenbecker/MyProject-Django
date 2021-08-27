@@ -9,4 +9,7 @@ def get_item(dictionary, key):
 
 @register.filter
 def index(iter, index):
-    return iter[index]
+    if iter:
+        return iter[index]
+    else:
+        return "1"

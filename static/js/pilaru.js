@@ -53,7 +53,40 @@ const API_URL_PREFIX = '/pilaru';
 // }
 
 
-function api_add_item_to_order(product_id) {
+$(document).on('click', 'button[name="add-product-to-order"]', function (){
+    let btn = $(this);
+    let product_id = $(this).attr('data-item-id');
+    $.ajax({
+        url: '/pilaru/orders/api/add_product_to_order',
+        type: 'post',
+        data: { 'product_id': product_id },
+        headers: {
+            'X-CSRFToken': csrftoken,
+        },
+        dataType: 'json',
+        success: function (data) {
+            btn[0].className = 'btn btn-success';
+            btn[0].innerHTML = 'Добавлен!';
+            btn[0].disabled = true;
+            if (data['result'] !== 'ok'){
+                alert(data['result'])
+            }else{
+                let current_qty = parseInt($span.attr('data-count'));
+                if (isNaN(current_qty)) {
+                    current_qty = 0;
+                }
+                $span.attr('data-count', current_qty + qty);
+            }
+
+        },
+        error: function (e) {
+            alert('Ошибка запроса к серверу: ' + e.toString());
+        }
+    });
+});
+
+
+function api_add_product_to_order(product_id) {
     $.ajax({
         url: API_URL_PREFIX + '/orders/api/add_product_to_order',
         type: 'post',
@@ -86,6 +119,25 @@ function api_remove_item_from_order(item_to_order_id) {
         url: API_URL_PREFIX + '/orders/api/remove_item_from_order',
         type: 'post',
         data: { 'item_to_order_id': item_to_order_id },
+        headers: {
+            'X-CSRFToken': csrftoken,
+        },
+        dataType: 'json',
+        success: function (data) {
+            document.location.reload();
+        },
+        error: function (e) {
+            alert('Ошибка запроса к серверу: ' + e.toString());
+        }
+    });
+}
+
+
+function api_remove_product_from_order(product_to_order_id) {
+    $.ajax({
+        url: API_URL_PREFIX + '/orders/api/remove_product_from_order',
+        type: 'post',
+        data: { 'product_to_order_id': product_to_order_id },
         headers: {
             'X-CSRFToken': csrftoken,
         },
@@ -173,10 +225,20 @@ $(document.body).on("change", 'select[name="select_stage"]', function(){
     });
 });
 
+
 function replaceItem(btn, item_id, item_to_order_id){
     api_remove_item_from_order(item_to_order_id);
     api_add_item_to_order(btn, item_id);
 }
+
+
+$(document).on('click', 'button[name="replace-product"]', function(){
+    let $btn = $(this);
+    var product_id_to_replace = $btn.attr('data-item-id').split('_')[0]; // Тот, который надо заменить
+    var product_id_replace = $btn.attr('data-item-id').split('_')[1]; // Тот, на который меняем
+    api_add_product_to_order(product_id_replace);
+    api_remove_product_from_order(product_id_to_replace);
+});
 
 
 $(document).on('click', 'button[name="btn-choose-similar"]', function () {
@@ -234,6 +296,55 @@ $(document).on('change', 'input[name="select-item"]', function () {
 });
 
 
+$(document).on('click', 'a[name="send-message-to-suppliers"]', function () {
+    let $btn = $(this);
+    var order_id = $btn.attr('data-item-id');
+    var qties = $('input[name="item_qty"][data-item-to-order-id="'+ order_id + '"]');
+    var qtn_data = new Object();
+    for(var input of qties){
+        qtn_data[input.attributes['data-item-id'].value] = input.value;
+    }
+    $.ajax({
+        // TODO:Need To change
+        url: API_URL_PREFIX + '/orders/api/send_message_to_suppliers',
+        type: 'post',
+        data: { 'order_id': order_id , 'qtn_data': JSON.stringify(qtn_data) },
+        headers: {
+            'X-CSRFToken': csrftoken,
+        },
+        dataType: 'jsonp',
+        success: function (data) {
+            document.location.reload();
+        },
+        error: function (e) {
+            alert('Ошибка запроса к серверу: ' + e['error']);
+        }
+    });
+});
+
+
+$('input[name="product_qty"]').change(function(){
+    let product_id = this.getAttribute('data-product-id');
+    let quantity = this.value;
+    $.ajax({
+        // TODO:Need To change
+        url: API_URL_PREFIX + '/orders/api/change_product_qty_in_order',
+        type: 'post',
+        data: { 'product_to_order_id': product_id , 'quantity': quantity },
+        headers: {
+            'X-CSRFToken': csrftoken,
+        },
+        dataType: 'json',
+        success: function (data) {
+            $('input[name="item_qty"][data-product-id="'+ product_id + '"]').each(function(index, value){
+                value.value = quantity;
+            });
+        },
+        error: function (e) {
+            alert('Ошибка запроса к серверу: ' + e['error']);
+        }
+    });
+});
 
 
 var myModal = document.getElementById('myModal')

@@ -15,7 +15,12 @@
             <p>Номер позиции: П{{ product.id }}</p>
             <p>Категория: {{ product.category }}</p>
             <p>Единица измерения: {{ product.get_unit_measurement_display }}</p>
-            <button class="btn btn-primary" onclick="api_add_item_to_order({{ product.id }})">Добавить продукт в заказ</button>
+            {% if not is_in_order %}
+<!--            onclick="api_add_product_to_order({{ product.id }})"-->
+            <button class="btn btn-primary" name="add-product-to-order" data-item-id="{{ product.id }}">Добавить продукт в заказ</button>
+            {% else %}
+            <button class="btn btn-secondary" name="add-product-to-order" data-item-id="{{ product.id }}" disabled>Уже добавлен!</button>
+            {% endif %}
             <h5 class="mt-5">Предложения:</h5>
 
             <div class="card shadow mb-4">
@@ -133,7 +138,27 @@
     <!-- Page level plugins -->
     <script src="/static/vendor/datatables/jquery.dataTables.min.js"></script>
     <script src="/static/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+    <script src="/static/js/pilaru.js"></script>
     <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+
+        const csrftoken = getCookie('csrftoken');
+
         $(document).ready(function() {
             $('#dataTable').DataTable({
                 "language": {
@@ -141,6 +166,38 @@
                 },
                 "paging": false,
                 "searching": false
+            });
+        });
+
+        $(document).on('click', 'button[name="add-product-to-order"]', function (){
+            let btn = $(this);
+            let product_id = $(this).attr('data-item-id');
+            $.ajax({
+                url: '/pilaru/orders/api/add_product_to_order',
+                type: 'post',
+                data: { 'product_id': product_id },
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                },
+                dataType: 'json',
+                success: function (data) {
+                    btn[0].className = 'btn btn-success';
+                    btn[0].innerHTML = 'Добавлен!';
+                    btn[0].disabled = true;
+                    if (data['result'] !== 'ok'){
+                        alert(data['result'])
+                    }else{
+                        let current_qty = parseInt($span.attr('data-count'));
+                        if (isNaN(current_qty)) {
+                            current_qty = 0;
+                        }
+                        $span.attr('data-count', current_qty + qty);
+                    }
+
+                },
+                error: function (e) {
+                    alert('Ошибка запроса к серверу: ' + e.toString());
+                }
             });
         });
     </script>

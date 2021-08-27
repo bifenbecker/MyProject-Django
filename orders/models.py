@@ -37,7 +37,7 @@ STAGE_ORDER_CHOICES = (
 
 class Order(models.Model):
     project = models.ForeignKey('projects.Project', on_delete=models.CASCADE, related_name='orders_in_project', null=True)
-    order_stage = models.PositiveSmallIntegerField(choices=STAGE_ORDER_CHOICES, verbose_name='Этап формирования', default=STAGE_ORDER_CHOICES[0])
+    order_stage = models.PositiveSmallIntegerField(choices=STAGE_ORDER_CHOICES, verbose_name='Этап формирования', default=1)
     created_by = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='orders', verbose_name='Создатель')
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
 
@@ -56,6 +56,15 @@ class Order(models.Model):
 
     def is_empty(self):
         return len(self.products_in_order.all()) == 0
+
+    def set_stage(self, stage: int):
+        for key in STAGE_ORDER_CHOICES:
+            if stage in key:
+                self.order_stage = stage
+                self.save()
+                return
+
+        raise Exception("Нет такого этапа")
 
     def __str__(self):
         return str(self.created_by)
@@ -94,6 +103,7 @@ class Stage(models.Model):
 
 class ItemToOrder(models.Model):
     item = models.ForeignKey('items.Item', on_delete=models.CASCADE, related_name="orders", verbose_name="Товар")
+    # product_to_order = models.ForeignKey('ProductToOrder', on_delete=models.CASCADE, related_name='items', verbose_name="Продукт")
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items_in_order', verbose_name='Заказ')
     selected = models.BooleanField(verbose_name="Выбран", default=False)
     quantity = models.PositiveIntegerField(verbose_name='Количество')
@@ -113,6 +123,14 @@ class ItemToOrder(models.Model):
         self.stage = stage
         self.save()
 
+    def select(self):
+        self.selected = True
+        self.save()
+
+    def unselect(self):
+        self.selected = False
+        self.save()
+
     class Meta:
         ordering = ['id']
         verbose_name = 'Товар в заказе'
@@ -124,6 +142,7 @@ class ProductToOrder(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='products_in_order', verbose_name='Заказ', null=True, default=None)
     stage = models.ForeignKey(Stage, on_delete=models.PROTECT, related_name='+', null=True, blank=True,
                               verbose_name='Этап')
+    quantity = models.PositiveIntegerField(verbose_name='Количество', default=1)
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
 
     def __str__(self):
