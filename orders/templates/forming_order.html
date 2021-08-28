@@ -6,13 +6,18 @@
 
     <!-- Custom styles for this page -->
     <link href="/static/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
-
+<style>
+    .disabledbutton {
+        pointer-events: none;
+        opacity: 0.4;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 
     {% for active_order in active_orders %}
-    <div class="row justify-content-center">
+    <div class="row justify-content-center" id="{{ active_order.id }}">
         <div class="col-10">
             <h5>Позиции в заказе номер {{ active_order.id }}:</h5>
             <h5>Заказ с проекта - {{ active_order.project.name }}</h5>
@@ -84,71 +89,106 @@
                                         <th>Ед. измерения</th>
                                         <th>Кол-во</th>
                                         <th>Цена за единицу</th>
-                                        <th>Последняя цена - Поставщик</th>
+                                        <th>Последняя цена</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     {% if active_order.order_stage == 1 %}
-                                    {% for item_to_order in product_in_order.product.items.all %}
-                                        <tr>
-                                            <td>
-                                                <div class="form-check">
-                                                  <input style="width: auto; height: auto;" item-to-order-id="{{ item_to_order.id }}" name="select-item" class="form-check-input" type="checkbox" value="" id="flexCheckDefault" disabled>
-                                                </div>
-                                            </td>
-                                            <td>{{ item_to_order.id }}</td>
-                                            <td>{{ item_to_order.name }}</td>
-                                            <td>{{ item_to_order.supplier.name }}</td>
-                                            <td>{{ item_to_order.get_unit_measurement_display }}</td>
-                                            <td><input class="form-control" type="number" name="item_qty" min="1" step="1" data-item-to-order-id="{{ active_order.id }}" data-product-id="{{ product_in_order.id }}" data-item-id="{{ item_to_order.id }}" value="{{ product_in_order.quantity }}"></td>
-                                            <td>{% if item_to_order.get_total_price %}{{ item_to_order.get_total_price|floatformat:2 }}{% else %}-{% endif %}</td>
-                                            <td>{% if item_to_order.get_total_price %}{{ item_to_order.get_total_price|floatformat:2 }}{% else %}-{% endif %}</td>
-                                            {% if last_price|get_item:active_order.id|get_item:item_to_order.id %}
-                                            <td>{{ last_price|get_item:active_order.id|get_item:item_to_order.id|index:0 }} - {{ last_price|get_item:active_order.id|get_item:item_to_order.id|index:1 }}</td>
-                                            {% else %}
-                                            <td>У Вас пока нет истории и заказов :(</td>
-                                            {% endif %}
-                                        </tr>
-                                    {% endfor %}
+                                        {% for item_to_order in product_in_order.product.items.all %}
+                                            <tr>
+                                                <td>
+                                                    <div class="form-check">
+                                                      <input style="width: auto; height: auto;" item-to-order-id="{{ item_to_order.id }}" name="select-item" class="form-check-input" type="checkbox" value="" id="flexCheckDefault" disabled>
+                                                    </div>
+                                                </td>
+                                                <td>{{ item_to_order.id }}</td>
+                                                <td>{{ item_to_order.name }}</td>
+                                                <td>{{ item_to_order.supplier.name }}</td>
+                                                <td>{{ item_to_order.get_unit_measurement_display }}</td>
+                                                <td><input class="form-control" type="number" name="item_qty" min="1" step="1" data-item-to-order-id="{{ active_order.id }}" data-product-id="{{ product_in_order.id }}" data-item-id="{{ item_to_order.id }}" value="{{ product_in_order.quantity }}"></td>
+                                                <td>{% if item_to_order.get_total_price %}{{ item_to_order.get_total_price|floatformat:2 }}{% else %}-{% endif %}</td>
+                                                {% if last_price|get_item:active_order.id|get_item:item_to_order.id %}
+                                                <td>{{ last_price|get_item:active_order.id|get_item:item_to_order.id }}</td>
+                                                {% else %}
+                                                <td>У Вас пока нет истории заказов :(</td>
+                                                {% endif %}
+                                            </tr>
+                                        {% endfor %}
 
                                     {% elif active_order.order_stage == 2 %}
-                                    {% for item_to_order in active_order.items_in_order.all %}
-                                        {% if product_in_order.product.id == item_to_order.item.product.id %}
-                                        <tr>
-                                            <td>
-                                                <div class="form-check">
-                                                    {% if item_to_order.selected %}
-                                                    <input style="width: auto; height: auto;" item-to-order-id="{{ item_to_order.id }}" name="select-item" class="form-check-input" type="checkbox" value="" id="flexCheckDefault" checked>
-                                                    {% else %}
-                                                    <input style="width: auto; height: auto;" item-to-order-id="{{ item_to_order.id }}" name="select-item" class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                                        {% for item_to_order in active_order.items_in_order.all %}
+                                            {% if product_in_order.product.id == item_to_order.item.product.id %}
+                                            <tr>
+                                                <td>
+                                                    <div class="form-check">
+                                                      <input style="width: auto; height: auto;" item-to-order-id="{{ item_to_order.id }}" name="select-item" class="form-check-input" type="checkbox" value="" id="flexCheckDefault" disabled>
+                                                    </div>
+                                                </td>
+                                                <td>{{ item_to_order.item.id }}</td>
+                                                <td>{{ item_to_order.item.name }}</td>
+                                                <td>{{ item_to_order.item.supplier.name }}</td>
+                                                <td>{{ item_to_order.item.get_unit_measurement_display }}</td>
+                                                <td><input class="form-control" type="number" name="item_qty" data-item-to-order-id="{{ active_order.id }}" min="1" step="1" data-item-id="{{ item_to_order.id }}" value="{{ item_to_order.quantity }}"></td>
+                                                <td>
+                                                    {% if item_to_order.get_total_price %}{{ item_to_order.get_total_price|floatformat:2 }}{% else %}-{% endif %}
+                                                    {% if last_price|get_item:active_order.id|get_item:item_to_order.id %}
+                                                        {% if last_price|get_item:active_order.id|get_item:item_to_order.id|index:0 > item_to_order.get_total_price %}
+                                                            <i class="fas fa-level-down"></i>
+                                                        {% elif last_price|get_item:active_order.id|get_item:item_to_order.id|index:0 < item_to_order.get_total_price %}
+                                                            <i class="fas fa-level-up"></i>
+                                                        {% else %}
+                                                            =
+                                                        {% endif %}
                                                     {% endif %}
-                                                </div>
-                                            </td>
-                                            <td>{{ item_to_order.item.id }}</td>
-                                            <td>{{ item_to_order.item.name }}</td>
-                                            <td>{{ item_to_order.item.supplier.name }}</td>
-                                            <td>{{ item_to_order.item.get_unit_measurement_display }}</td>
-                                            <td><input class="form-control" type="number" name="item_qty" data-item-to-order-id="{{ active_order.id }}" min="1" step="1" data-item-id="{{ item_to_order.id }}" value="{{ item_to_order.quantity }}"></td>
-                                            <td>
-                                                {% if item_to_order.get_total_price %}{{ item_to_order.get_total_price|floatformat:2 }}{% else %}-{% endif %}
+                                                </td>
                                                 {% if last_price|get_item:active_order.id|get_item:item_to_order.id %}
-                                                    {% if last_price|get_item:active_order.id|get_item:item_to_order.id|index:0 > item_to_order.get_total_price %}
-                                                        <i class="fas fa-level-down"></i>
-                                                    {% elif last_price|get_item:active_order.id|get_item:item_to_order.id|index:0 < item_to_order.get_total_price %}
-                                                        <i class="fas fa-level-up"></i>
-                                                    {% else %}
-                                                        =
-                                                    {% endif %}
+    <!--                                            <td>{{ last_price|get_item:active_order.id|get_item:item_to_order.id|index:0 }} - {{ last_price|get_item:active_order.id|get_item:item_to_order.id|index:1 }}</td>-->
+                                                    <td>{{ last_price|get_item:active_order.id|get_item:item_to_order.id }}</td>
+                                                {% else %}
+                                                <td>У Вас пока нет истории и заказов :(</td>
                                                 {% endif %}
-                                            </td>
-                                            {% if last_price|get_item:active_order.id|get_item:item_to_order.id %}
-                                            <td>{{ last_price|get_item:active_order.id|get_item:item_to_order.id|index:0 }} - {{ last_price|get_item:active_order.id|get_item:item_to_order.id|index:1 }}</td>
-                                            {% else %}
-                                            <td>У Вас пока нет истории и заказов :(</td>
+                                            </tr>
                                             {% endif %}
-                                        </tr>
-                                        {% endif %}
-                                    {% endfor %}
+                                        {% endfor %}
+                                    {% elif active_order.order_stage == 3 %}
+                                        {% for item_to_order in active_order.items_in_order.all %}
+                                            {% if product_in_order.product.id == item_to_order.item.product.id %}
+                                            <tr>
+                                                <td>
+                                                    <div class="form-check">
+                                                        {% if item_to_order.selected %}
+                                                        <input name="select-item" item-to-order-id="{{ item_to_order.id }}" class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+                                                        {% else %}
+                                                        <input name="select-item" item-to-order-id="{{ item_to_order.id }}" class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                                                        {% endif %}
+                                                    </div>
+                                                </td>
+                                                <td>{{ item_to_order.item.id }}</td>
+                                                <td>{{ item_to_order.item.name }}</td>
+                                                <td>{{ item_to_order.item.supplier.name }}</td>
+                                                <td>{{ item_to_order.item.get_unit_measurement_display }}</td>
+                                                <td><input class="form-control" type="number" name="item_qty" data-item-to-order-id="{{ active_order.id }}" min="1" step="1" data-item-id="{{ item_to_order.id }}" value="{{ item_to_order.quantity }}"></td>
+                                                <td>
+                                                    {% if item_to_order.get_total_price %}{{ item_to_order.get_total_price|floatformat:2 }}{% else %}-{% endif %}
+                                                    {% if last_price|get_item:active_order.id|get_item:item_to_order.id %}
+                                                        {% if last_price|get_item:active_order.id|get_item:item_to_order.id|index:0 > item_to_order.get_total_price %}
+                                                            <i class="fas fa-level-down"></i>
+                                                        {% elif last_price|get_item:active_order.id|get_item:item_to_order.id|index:0 < item_to_order.get_total_price %}
+                                                            <i class="fas fa-level-up"></i>
+                                                        {% else %}
+                                                            =
+                                                        {% endif %}
+                                                    {% endif %}
+                                                </td>
+                                                {% if last_price|get_item:active_order.id|get_item:item_to_order.id %}
+    <!--                                            <td>{{ last_price|get_item:active_order.id|get_item:item_to_order.id|index:0 }} - {{ last_price|get_item:active_order.id|get_item:item_to_order.id|index:1 }}</td>-->
+                                                    <td>{{ last_price|get_item:active_order.id|get_item:item_to_order.id }}</td>
+                                                {% else %}
+                                                <td>У Вас пока нет истории и заказов :(</td>
+                                                {% endif %}
+                                            </tr>
+                                            {% endif %}
+                                        {% endfor %}
                                     {% endif %}
                                     </tbody>
                                 </table>
@@ -207,9 +247,16 @@
                 {% if active_order.order_stage == 1 %}
                 <a href="#" class="btn btn-outline-secondary float-right" name="send-message-to-suppliers" data-item-id="{{ active_order.id }}">Запросить цену</a>
                 {% elif active_order.order_stage == 2 %}
-                <a href="#" class="btn btn-outline-secondary float-right" name="-" data-item-id="{{ active_order.id }}">Оформить заказ</a>
+                    {% if active_order.is_answer_all_suppliers %}
+                    <a href="#" class="btn btn-outline-secondary float-right" name="make-order" data-item-id="{{ active_order.id }}">Оформить заказ</a>
+                    {% else %}
+                    <a href="#" class="btn btn-outline-secondary float-right" name="-" data-item-id="{{ active_order.id }}">Оформить заказ</a>
+                    {% endif %}
+                {% elif active_order.order_stage == 3 %}
+                <a href="#" class="btn btn-outline-secondary float-right" name="-" data-item-id="{{ active_order.id }}">Подтвердить выбранные товары</a>
                 {% endif %}
 
+                <a href="#" class="btn btn-outline-danger float-right mr-2" name="close-order" data-item-id="{{ active_order.id }}">Закрыть заказ</a>
             {% else %}
             <h2>Пусто</h2>
             {% endif %}

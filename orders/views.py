@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 
-from items.models import Item, Product
+from items.models import Item, Product, Supplier
 from .models import Order, Stage, ItemToOrder, OrderState, OrderStateToOrder, PriceOffer, ProductToOrder
 
 import random
@@ -15,44 +15,42 @@ from decimal import Decimal
 
 
 
-def get_history_order(orders):
+def get_history_order(user):
     try:
-        history_order_by_user = []
-        _state = OrderState.objects.filter(name='Активный').first()
-        for _order in orders:
-            _orders = OrderStateToOrder.objects.filter(state=_state, order=_order, finished_date__isnull=False)
-            if len(_orders) > 0:
-                for o in _orders:
-                    history_order_by_user.append(o)
+        history_order = []
+        for order in user.orders.all():
+            if not order.is_active():
+                history_order.append(order)
 
-        if len(history_order_by_user) != 0:
-            return history_order_by_user
-        else:
+        if len(history_order) == 0:
             raise ObjectDoesNotExist("У Вас пока нет истории заказов :(")
+        else:
+            return history_order
     except ObjectDoesNotExist:
         raise ObjectDoesNotExist("У Вас пока нет истории заказов :(")
 
 
-def find_last_item_price_and_supplier_in_orders(item: ItemToOrder, orders: list):
-    orders = orders[::-1]
+def find_last_item_price_from_supplier_in_orders(item: ItemToOrder, orders: list):
     for order in orders:
-        for item_in_order in order.order.items_in_order.all():
+        for item_in_order in order.items_in_order.all():
             if item_in_order.item.supplier.name == item.item.supplier.name and item_in_order.item.name == item.item.name:
-                return (float(item_in_order.price_offer.price_per_unit), item_in_order.item.supplier.name)
+                return float(item_in_order.price_offer.price_per_unit)
 
-    return ("-", "-")
+    return "Такого товара не было ранее"
 
 
 def get_last_price_by_order(user, order):
     last_price = {}
-    orders = user.orders.all()
+
     try:
-        history_order_by_user = get_history_order(orders)
-        for item_in_active_order in order.items_in_order.all():
-            last_price[item_in_active_order.id] = find_last_item_price_and_supplier_in_orders(
-                item_in_active_order,
-                history_order_by_user)
-    except ObjectDoesNotExist as e:
+        history_order_by_user = get_history_order(user)
+        if len(order.items_in_order.all()) != 0:
+            for item_in_active_order in order.items_in_order.all():
+                last_price[item_in_active_order.id] = find_last_item_price_from_supplier_in_orders(
+                    item_in_active_order,
+                    history_order_by_user)
+
+    except Exception as e:
         # TODO: Need to check
         # for item_in_active_order in order.items_in_order.all():
         #     last_price[item_in_active_order.id] = (str(e), '')
@@ -61,7 +59,7 @@ def get_last_price_by_order(user, order):
         #         last_price[item.id] = (str(e), '')
         for product_in_order in order.products_in_order.all():
             for item in product_in_order.product.items.all():
-                last_price[item.id] = None
+                last_price[item.id] = str(e)
 
     return last_price if last_price else None
 
@@ -125,26 +123,8 @@ class FormingOrderView(View):
         if len(active_orders_by_projects) != 0:
             for order in active_orders_by_projects:
                 last_price_orders.update({order.id: get_last_price_by_order(request.user, order)})
-                if order.order_stage > 1:
-                    for product in order.products_in_order.all():
-                        min_price = 0
-                        best_items = []
-                        for item in order.items_in_order.all():
-                            if item.item.product == product.product:
-                                if len(best_items) == 0:
-                                    min_price = item.price_offer.price_per_unit
-                                    best_items.append(item)
 
-                                if item.price_offer.price_per_unit < min_price:
-                                    min_price = item.price_offer.price_per_unit
-                                    best_items = [item]
-                                elif item.price_offer.price_per_unit == min_price:
-                                    min_price = item.price_offer.price_per_unit
-                                    best_items.append(item)
-
-                        for best in best_items:
-                            best.select()
-
+        print(last_price_orders)
         if len(active_orders_by_projects) != 0:
             context['active_orders'] = active_orders_by_projects
             context['last_price'] = last_price_orders
@@ -166,8 +146,7 @@ class HistoryOrderView(View):
         }
         try:
             orders = request.user.orders.all()
-            history_order_by_user = get_history_order(orders)
-            context.update({'order_list': history_order_by_user})
+            context.update({'order_list': orders})
             return render(request, self.template_name, context=context)
         except ObjectDoesNotExist as e:
             context.update({'error': str(e)})
@@ -181,13 +160,13 @@ class HistoryOrderDetailView(View):
     def get(self, request, *args, **kwargs):
         order_id = kwargs['order_id']
 
-        order_state_to_order = OrderStateToOrder.objects.get(id=order_id)
-        order = Order.objects.get(id=order_state_to_order.order_id)
+        # order_state_to_order = OrderStateToOrder.objects.get(id=order_id)
+        order = Order.objects.get(id=order_id)
 
         if order.created_by == request.user:
             context = {
                 'page_title': settings.PAGE_TITLE_PREFIX + 'Заказ: ' + str(order.id),
-                'toolbar_title': 'Заказ: ' + str(order.id) + ' От ' + str(order.created_date).split(".")[0]
+                'toolbar_title': 'Заказ: ' + str(order.id) + ' От ' + str(order.created_date).split(".")[0] + " (" + order.order_states.filter(finished_date__isnull=False).first().state.name + ")"
             }
             context['active_order'] = order
             return render(request, self.template_name, context=context)
@@ -224,11 +203,12 @@ class AddToOrderAPIView(APIView):
 
             # Order
             order = user.active_order
-            if order is None:
-                order = user.get_active_order()
+
             # Create order if does not exists
             # TODO: Need to check on bugs
             if order is None:
+                if user.get_active_orders_from_projects() > 0:
+                    return Response({'result': 'Выберите заказ с проекта'})
                 active_project = user.get_active_project()
                 if active_project is None:
                     return Response({'result': 'Создайте или вступите в проект'})
@@ -344,9 +324,12 @@ class CloseOrderAPIView(APIView):
 
             order.set_order_state(OrderState.objects.get(name='Отменен'))
 
+            if order == request.user.active_order:
+                request.user.active_order = None
+                request.user.save()
+
             return Response({'result': 'ok'})
         except Exception as e:
-            print(e)
             return Response('error', status=500)
 
 
@@ -440,4 +423,38 @@ class SendMessageToSuppliers(APIView):
             return Response({'Result': 'Ok'})
         else:
             return Response({'error': "У Вас уже отправлен запрос на этот заказ"})
+
+
+class MakeOrderAPI(APIView):
+
+    def post(self, request):
+        order_id = request.data['order_id']
+        order = Order.objects.get(id=order_id)
+        if order.order_stage == 2:
+            for product in order.products_in_order.all():
+                min_price = 0
+                best_items = []
+                for item in order.items_in_order.all():
+                    if item.item.product == product.product:
+                        if len(best_items) == 0:
+                            min_price = item.price_offer.price_per_unit
+                            best_items.append(item)
+
+                        if item.price_offer.price_per_unit < min_price:
+                            min_price = item.price_offer.price_per_unit
+                            best_items = [item]
+                        elif item.price_offer.price_per_unit == min_price:
+                            min_price = item.price_offer.price_per_unit
+                            best_items.append(item)
+
+                for best in best_items:
+                    print(best)
+                    print(best.selected)
+                    best.select()
+                    print(best.selected)
+
+            order.set_stage(3)
+
+        return Response({"Result": 'OK'})
+
 # endregion

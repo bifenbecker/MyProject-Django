@@ -48,7 +48,11 @@ class Project(models.Model):
         return self.name
 
     def get_active_order(self):
-        return self.orders_in_project.all().last()
+        last_order = self.orders_in_project.all().last()
+        if last_order.is_active() or last_order.is_finished():
+            return last_order
+        else:
+            return None
 
     class Meta:
         verbose_name = 'Проект'

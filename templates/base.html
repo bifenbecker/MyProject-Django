@@ -188,27 +188,12 @@
                     {% if user.is_authenticated %}
 
                     <li class="nav-item dropdown no-arrow mx-1">
-                        <a class="nav-link dropdown-toggle" href="#" id="FormingOrdersDropdown" role="button"
-                           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <i class="fas fa-th-list"></i>
-                            <!-- Counter - Forming Orders -->
-                            <span class="badge badge-danger badge-counter">{{ user.forming_orders.all|length  }}</span>
-                        </a>
-                        <!-- Dropdown - Forming Orders -->
-                        <div id="ActiveFormigOrders" class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                             aria-labelledby="messagesDropdown">
-                            <h6 class="dropdown-header">
-                                Ваши несформированные заказы
-                            </h6>
-                        </div>
-                    </li>
-
-                    <li class="nav-item dropdown no-arrow mx-1">
                         <a class="nav-link dropdown-toggle" href="#" id="ordersDropdown" role="button"
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <i class="fas fa-th-list"></i>
                             <!-- Counter - Orders -->
-                            <span class="badge badge-danger badge-counter">{{ user.member_in_projects.all|length  }}</span>
+                                <span class="badge badge-danger badge-counter">{{ user.get_active_orders_from_projects }}</span>
+
                         </a>
                         <!-- Dropdown - Orders -->
                         <div id="ActiveOrders" class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"

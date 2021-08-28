@@ -21,6 +21,15 @@ class User(AbstractUser):
         else:
             return None
 
+    def get_active_orders_from_projects(self):
+        projects = self.member_in_projects.all()
+        res = 0
+        for project in projects:
+            if project.project.get_active_order():
+                res += 1
+
+        return res
+
     def set_active_order(self, order: Order):
         self.active_order = order
         self.save()

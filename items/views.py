@@ -175,17 +175,14 @@ class SelectItemAPI(APIView):
 
     def post(self, request):
         try:
-            item_id = request.data['item_id']
-            item_to_order_item_id = request.GET.get('item_to_order_item_id')
-            item = Item.objects.get(id=item_to_order_item_id)
-            for similar_product in item.product.similar.all():
-                item = {}
-                for similar in similar_product.items.all():
-                    item['id'] = similar.id
-                    item['name'] = similar.name
-                    item['supplier'] = similar.supplier.name
-                    item['unit_measurement'] = UNIT_MEASUREMENT_CHOICES[similar.unit_measurement][1]
-                similars.append(item)
-            return Response({'similars': similars})
+            item_to_order_id = request.data['item_to_order_id']
+            item_to_order = ItemToOrder.objects.get(id=item_to_order_id)
+            is_checked = bool(int(request.data['is_checked']))
+            if is_checked:
+                item_to_order.select()
+            else:
+                item_to_order.unselect()
+
+            return Response({"Result": "Ok"})
         except:
-            return Response({'error': 'Не удалось найти аналоги'})
+            return Response({'error': 'Не удалось выбрать товар'})

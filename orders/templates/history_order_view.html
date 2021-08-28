@@ -6,7 +6,12 @@
 {% else %}
 <ul>
     {% for order in order_list %}
-        <a href="{% url 'history_order_detail_view_url' order_id=order.id %}">{{ order.created_date }} - {{ order.order_id }}</a><br>
+        {% if order.is_closed %}
+        <a href="{% url 'history_order_detail_view_url' order_id=order.id %}">{{ order.created_date }} - {{ order.order_id }} (Закрыт)</a><br>
+        {% elif order.ic_finished %}
+        <a href="{% url 'history_order_detail_view_url' order_id=order.id %}">{{ order.created_date }} - {{ order.order_id }} (Завершен)</a><br>
+        {% endif %}
+
     {% endfor %}
 </ul>
 {% endif %}

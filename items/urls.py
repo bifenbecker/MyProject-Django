@@ -9,4 +9,5 @@ urlpatterns = [
     # path('api/search_items', SearchItemsAPI.as_view()),
     path('api/set_stage', SetProductStageAPI.as_view()),
     path('api/get_similar', GetSimilarsAPI.as_view()),
+    path('api/select_item', SelectItemAPI.as_view()),
 ]

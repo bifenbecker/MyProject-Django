@@ -41,6 +41,30 @@ class Order(models.Model):
     created_by = models.ForeignKey('accounts.User', on_delete=models.CASCADE, related_name='orders', verbose_name='Создатель')
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
 
+    def is_answer_all_suppliers(self):
+        for item_in_order in self.items_in_order.all():
+            if not item_in_order.price_offer:
+                return False
+        return True
+
+    def is_active(self):
+        order_satates = self.order_states.filter(finished_date__isnull=False).all()
+        return True if len(order_satates) == 0 else False
+
+    def is_closed(self):
+        order_satate = self.order_states.filter(finished_date__isnull=True).first()
+        if order_satate and order_satate.state == OrderState.objects.get(name="Отменен"):
+            return True
+        else:
+            return False
+
+    def is_finished(self):
+        order_satate = self.order_states.filter(finished_date__isnull=True).first()
+        if order_satate and order_satate.state == OrderState.objects.get(name="Завершен"):
+            return True
+        else:
+            return False
+
     def get_order_state(self):
         return self.order_states.filter(finished_date__isnull=True).first()
 
@@ -107,7 +131,7 @@ class ItemToOrder(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items_in_order', verbose_name='Заказ')
     selected = models.BooleanField(verbose_name="Выбран", default=False)
     quantity = models.PositiveIntegerField(verbose_name='Количество')
-    price_offer = models.OneToOneField(PriceOffer, on_delete=models.PROTECT, blank=True, null=True, verbose_name='Предложение цены')
+    price_offer = models.OneToOneField(PriceOffer, on_delete=models.PROTECT, blank=True, null=True, default=None, verbose_name='Предложение цены')
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
 
     def __str__(self):

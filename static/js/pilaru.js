@@ -276,23 +276,24 @@ $(document).on('click', 'button[name="btn-choose-similar"]', function () {
 
 
 $(document).on('change', 'input[name="select-item"]', function () {
-    console.log(this)
-    // $.ajax({
-    //     // TODO:Need To change
-    //     url: '/pilaru/items/api/get_similar',
-    //     type: 'get',
-    //     data: { 'item_to_order_item_id': item_to_order_item_id },
-    //     headers: {
-    //         'X-CSRFToken': csrftoken,
-    //     },
-    //     dataType: 'json',
-    //     success: function (data) {
+    var item_to_order_id = $(this).attr('item-to-order-id');
+    var is_checked = this.checked;
+    $.ajax({
+        // TODO:Need To change
+        url: '/pilaru/items/api/select_item',
+        type: 'post',
+        data: { 'item_to_order_id': item_to_order_id , 'is_checked': +is_checked },
+        headers: {
+            'X-CSRFToken': csrftoken,
+        },
+        dataType: 'json',
+        success: function (data) {
 
-    //     },
-    //     error: function (e) {
-    //         alert('Ошибка запроса к серверу: ' + e['error']);
-    //     }
-    // });
+        },
+        error: function (e) {
+            alert('Ошибка запроса к серверу: ' + e['error']);
+        }
+    });
 });
 
 
@@ -339,6 +340,36 @@ $('input[name="product_qty"]').change(function(){
             $('input[name="item_qty"][data-product-id="'+ product_id + '"]').each(function(index, value){
                 value.value = quantity;
             });
+        },
+        error: function (e) {
+            alert('Ошибка запроса к серверу: ' + e['error']);
+        }
+    });
+});
+
+
+$('a[name="close-order"]').click(function(){
+    var order_id = $(this).attr('data-item-id');
+    api_close_order(order_id);
+    $('div[id="' + order_id + '"]').addClass("disabledbutton");
+    this.className = 'btn btn-outline-info float-right mr-2';
+    this.innerHTML = 'Закрыт!';
+});
+
+
+$('a[name="make-order"]').click(function(){
+    var order_id = $(this).attr('data-item-id');
+    $.ajax({
+        // TODO:Need To change
+        url: API_URL_PREFIX + '/orders/api/make-order',
+        type: 'post',
+        data: { 'order_id': order_id  },
+        headers: {
+            'X-CSRFToken': csrftoken,
+        },
+        dataType: 'json',
+        success: function (data) {
+            document.location.reload();
         },
         error: function (e) {
             alert('Ошибка запроса к серверу: ' + e['error']);

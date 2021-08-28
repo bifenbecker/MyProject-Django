@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 
-from orders.models import Stage, Order
+from orders.models import Stage, Order, OrderStateToOrder, OrderState
 from orders.views import get_last_price_by_order
 from .models import *
 
@@ -45,6 +45,7 @@ class CreateProjectView(View):
         if form.is_valid():
             new_project = Project.objects.create(name=form.cleaned_data['name'])
             order = Order.objects.create(created_by=request.user, project=new_project)
+            order_state_to_order = OrderStateToOrder.objects.create(order=order, state=OrderState.objects.get(name='Активный'))
             request.user.set_active_order(order)
             ProjectMember.objects.create(user=request.user, access=0, project=new_project)
             return redirect('project_detail_url', project_id=new_project.id)
