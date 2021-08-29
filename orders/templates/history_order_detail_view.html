@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
-
+{% load get_item %}
+{% load index %}
 {% block custom_head %}
 
     <!-- Custom styles for this page -->
@@ -112,6 +113,30 @@
                                         </tr>
                                         {% endif %}
                                     {% endfor %}
+                                    {% elif active_order.order_stage == 3 %}
+                                        {% for item_to_order in active_order.items_in_order.all %}
+                                            {% if product_in_order.product.id == item_to_order.item.product.id %}
+                                            <tr>
+                                                <td>
+                                                    <div class="form-check">
+                                                        {% if item_to_order.selected %}
+                                                        <input name="select-item" item-to-order-id="{{ item_to_order.id }}" class="form-check-input" type="checkbox" value="" id="flexCheckChecked" checked>
+                                                        {% else %}
+                                                        <input name="select-item" item-to-order-id="{{ item_to_order.id }}" class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                                                        {% endif %}
+                                                    </div>
+                                                </td>
+                                                <td>{{ item_to_order.item.id }}</td>
+                                                <td>{{ item_to_order.item.name }}</td>
+                                                <td>{{ item_to_order.item.supplier.name }}</td>
+                                                <td>{{ item_to_order.item.get_unit_measurement_display }}</td>
+                                                <td><input class="form-control" type="number" name="item_qty" data-item-to-order-id="{{ active_order.id }}" min="1" step="1" data-item-id="{{ item_to_order.id }}" value="{{ item_to_order.quantity }}"></td>
+                                                <td>
+                                                    {% if item_to_order.get_total_price %}{{ item_to_order.get_total_price|floatformat:2 }}{% else %}-{% endif %}
+                                                </td>
+                                            </tr>
+                                            {% endif %}
+                                        {% endfor %}
                                     {% endif %}
                                     </tbody>
                                 </table>

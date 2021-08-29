@@ -30,10 +30,10 @@ def get_history_order(user):
         raise ObjectDoesNotExist("У Вас пока нет истории заказов :(")
 
 
-def find_last_item_price_from_supplier_in_orders(item: ItemToOrder, orders: list):
+def find_last_item_price_from_supplier_in_orders(item: Item, orders: list):
     for order in orders:
         for item_in_order in order.items_in_order.all():
-            if item_in_order.item.supplier.name == item.item.supplier.name and item_in_order.item.name == item.item.name:
+            if item_in_order.item.supplier.name == item.supplier.name and item_in_order.item.name == item.name:
                 return float(item_in_order.price_offer.price_per_unit)
 
     return "Такого товара не было ранее"
@@ -47,8 +47,14 @@ def get_last_price_by_order(user, order):
         if len(order.items_in_order.all()) != 0:
             for item_in_active_order in order.items_in_order.all():
                 last_price[item_in_active_order.id] = find_last_item_price_from_supplier_in_orders(
-                    item_in_active_order,
+                    item_in_active_order.item,
                     history_order_by_user)
+        else:
+            for product in order.products_in_order.all():
+                for item_in_product in product.product.items.all():
+                    last_price[item_in_product.id] = find_last_item_price_from_supplier_in_orders(
+                        item_in_product,
+                        history_order_by_user)
 
     except Exception as e:
         # TODO: Need to check
@@ -89,7 +95,6 @@ class OrderView(View):
         for member in request.user.member_in_projects.all():
             if member.project.get_active_order():
                 active_orders_by_projects.append(member.project.get_active_order())
-
         last_price_orders = {}
         if len(active_orders_by_projects) != 0:
             for order in active_orders_by_projects:
@@ -159,8 +164,6 @@ class HistoryOrderDetailView(View):
     @is_auth
     def get(self, request, *args, **kwargs):
         order_id = kwargs['order_id']
-
-        # order_state_to_order = OrderStateToOrder.objects.get(id=order_id)
         order = Order.objects.get(id=order_id)
 
         if order.created_by == request.user:
@@ -170,11 +173,6 @@ class HistoryOrderDetailView(View):
             }
             context['active_order'] = order
             return render(request, self.template_name, context=context)
-
-        # Protect order
-        # TODO: make error
-        # else:
-
 
 # endregion
 

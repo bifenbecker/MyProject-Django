@@ -12,6 +12,7 @@ def get_item(dictionary, key):
 
 @register.filter
 def index(iter, index):
+    print(iter, index)
     if iter:
         return iter[index]
     else:
