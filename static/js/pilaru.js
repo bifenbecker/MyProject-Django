@@ -315,9 +315,13 @@ $(document).on('click', 'a[name="send-message-to-suppliers"]', function () {
         },
         dataType: 'jsonp',
         success: function (data) {
+            console.log(1);
+            console.log(data);
             document.location.reload();
         },
         error: function (e) {
+            console.log(2);
+            console.log(e);
             alert('Ошибка запроса к серверу: ' + e['error']);
         }
     });
@@ -376,6 +380,14 @@ $('a[name="make-order"]').click(function(){
         }
     });
 });
+
+
+function get_select_value(id){
+    var select = document.getElementById(id);
+    var value = select.options[sel.selectedIndex].value;
+    return value;
+}
+
 
 
 var myModal = document.getElementById('myModal')

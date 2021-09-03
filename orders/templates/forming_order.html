@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 {% load get_item %}
 {% load index %}
@@ -45,7 +44,7 @@
                                     <tr>
                                         <td><a href="{% url 'product_details_url' product_id=product_in_order.product.id %}" style="text-decoration: none; ">{{ product_in_order.product }}</a></td>
                                         <td>
-                                            <select name="select_stage" onchange="" style="margin-bottom: 10px; display: block;">
+                                            <select id="{{ product_in_order.id }}" name="select_stage" onchange="" style="margin-bottom: 10px; display: block;">
                                                 {% for stage in stages %}
                                                     {% if stage.id == product_in_order.stage.id %}
                                                     <option value="{{ stage.name }}_{{ stage.id }}" id="{{ product_in_order.id }}" selected>{{ stage.name }}</option>
@@ -110,7 +109,7 @@
                                                 {% if last_price|get_item:active_order.id|get_item:item_to_order.id %}
                                                 <td>{{ last_price|get_item:active_order.id|get_item:item_to_order.id }}</td>
                                                 {% else %}
-                                                <td>У Вас пока нет истории заказов :(</td>
+                                                <td>{{ item_to_order.id }}У Вас пока нет истории заказов :(</td>
                                                 {% endif %}
                                             </tr>
                                         {% endfor %}
@@ -275,7 +274,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4"></script>
     <script src="/static/js/pilaru.js"></script>
     <script>
-
 
         function setGraph(obj){
             const data = {

@@ -1,13 +1,27 @@
+from time import sleep
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
+from django.core.mail import EmailMultiAlternatives
+from django.core.mail import send_mail
+from django.core import mail
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+
+
+import imaplib
+
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 
-from items.models import Item, Product, Supplier
+from items.models import Item, Product, Supplier, SupplierContact
 from .models import Order, Stage, ItemToOrder, OrderState, OrderStateToOrder, PriceOffer, ProductToOrder
 
 import random
@@ -111,7 +125,8 @@ class OrderView(View):
 
 
 class FormingOrderView(View):
-    template_name = "forming_order.html"
+    template_name = "order_view.html"
+    # template_name = "forming_order.html"
 
     @is_auth
     def get(self, request):
@@ -129,9 +144,9 @@ class FormingOrderView(View):
             for order in active_orders_by_projects:
                 last_price_orders.update({order.id: get_last_price_by_order(request.user, order)})
 
-        print(last_price_orders)
         if len(active_orders_by_projects) != 0:
-            context['active_orders'] = active_orders_by_projects
+            context['orders'] = active_orders_by_projects
+            # context['active_orders'] = active_orders_by_projects
             context['last_price'] = last_price_orders
             context['stages'] = Stage.objects.all()
             return render(request, self.template_name, context=context)
@@ -166,12 +181,14 @@ class HistoryOrderDetailView(View):
         order_id = kwargs['order_id']
         order = Order.objects.get(id=order_id)
 
+        state_order = "Закрыт" if order.is_closed() else "Завершён"
+
         if order.created_by == request.user:
             context = {
                 'page_title': settings.PAGE_TITLE_PREFIX + 'Заказ: ' + str(order.id),
-                'toolbar_title': 'Заказ: ' + str(order.id) + ' От ' + str(order.created_date).split(".")[0] + " (" + order.order_states.filter(finished_date__isnull=False).first().state.name + ")"
+                'toolbar_title': 'Заказ: ' + str(order.id) + ' От ' + str(order.created_date).split(".")[0] + " (" + state_order + ")"
             }
-            context['active_order'] = order
+            context['orders'] = [order]
             return render(request, self.template_name, context=context)
 
 # endregion
@@ -369,6 +386,14 @@ class SetActiveOrderAPI(APIView):
         return Response(orders)
 
 
+TEST_SUPPLIER_MAIL = 'supplier_test_1@mail.ru'
+TEST_SUPPLIER_PASSWORD = 'test_supplier'
+TEST_SUPPLIER_NAME = 'Очаг'
+
+TEST_USER_MAIL = 'user_test_4@mail.ru'
+TEST_USER_PASSWORD = 'test_user'
+
+
 class SendMessageToSuppliers(APIView):
     """
     API запроса цены у поставщиков
@@ -390,33 +415,120 @@ class SendMessageToSuppliers(APIView):
 
         order = Order.objects.get(id=order_id)
 
+        text = """
+        <html>
+            <head>
+                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+            </head>
+            <body>
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+            <div class="row justify-content-center">
+                <div class="col-10">
+                    <h5>Заказ с проекта - {0}</h5>
+                    <div class="card shadow mb-4">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered w-100" cellspacing="0">
+                                            <thead>
+                                            <tr>
+                                                <th>Номер</th>
+                                                <th>Название</th>
+                                                <th>Этап</th>
+                                                <th>Единица измерения</th>
+                                                <th>Колчисетво</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {1}
+                                            </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </body>
+        </html>
+        """
+        row_table = """
+            <tr>
+                <td>{0}</td>
+                <td>{1}</td>
+                <td>{2}</td>
+                <td>{3}</td>  
+                <td>{4}</td>                       
+            </tr>                       
+        """
+
+        data_suppliers = {}
         if order.order_stage == 1:
             try:
                 for product_in_order in order.products_in_order.all():
                     for item_in_order in product_in_order.product.items.all():
-                        # TODO: send request
+                        try:
+                            item_to_order = ItemToOrder.objects.get(
+                                item=item_in_order,
+                                order=order,
+                                quantity=qtn_data[str(item_in_order.id)]
+                            )
+                        except:
+                            item_to_order = None
 
-                        price_offer = PriceOffer.objects.create(
-                            item=item_in_order,
-                            for_quantity=qtn_data[str(item_in_order.id)],
-                            price_per_unit=random.randint(100, 1000)
-                        )
+                        if not item_to_order:
+                            item_to_order = ItemToOrder.objects.create(
+                                item=item_in_order,
+                                order=order,
+                                quantity=qtn_data[str(item_in_order.id)],
+                            )
 
-                        item_to_order = ItemToOrder.objects.create(
-                            item=item_in_order,
-                            order=order,
-                            quantity=qtn_data[str(item_in_order.id)],
-                            price_offer=price_offer
-                        )
+                        try:
+                            if item_in_order.supplier in data_suppliers.keys():
+                                data_suppliers[item_in_order.supplier][0].append(item_to_order)
+                            else:
+                                data_suppliers.update(
+                                    {item_in_order.supplier: ([item_to_order], product_in_order.stage)})
+
+                        except Exception as e:
+                            print(str(e))
+
+                for supplier in data_suppliers:
+                    # TODO: Какой контакт использовать
+                    supplier_contact = supplier.contacts.all().first()
+                    try:
+                        html_message = render_to_string('message_to_suppliers.html', context={'rows' : data_suppliers[supplier][0], 'stage': data_suppliers[supplier][1], 'project_name': order.project.name})
+                    except Exception as e:
+                        print(str(e))
+                    # msg = MIMEMultipart('alternative')
+                    # msg['Subject'] = "Запрос цены"
+                    # msg['From'] = settings.EMAIL_HOST_USER
+                    # msg['To'] = (supplier_contact.email)
+                    # text_message = strip_tags(html_message)
+                    # part1 = MIMEText(text_message, 'plain')
+                    # part2 = MIMEText(html_message, 'html')
+                    # msg.attach(part1)
+                    # msg.attach(part2)
+                    #
+                    # send_mail(
+                    #     'Запрос цены',
+                    #     msg.as_string(),
+                    #     settings.EMAIL_HOST_USER,
+                    #     [supplier_contact.email],
+                    #     fail_silently=False,
+                    # )
+                    plain_text = strip_tags(html_message)
+                    msg = EmailMultiAlternatives('Запрос цены', plain_text, settings.EMAIL_HOST_USER, [supplier_contact.email])
+                    msg.attach_alternative(html_message, "text/html")
+                    msg.send()
 
 
-            except:
+            except Exception as e:
+                print(str(e))
                 return Response({'error': "Не удалось отправить запрос"})
 
-            try:
-                order.set_stage(2)
-            except Exception as e:
-                raise Exception(str(e))
+            # try:
+            #     order.set_stage(2)
+            # except Exception as e:
+            #     raise Exception(str(e))
 
             return Response({'Result': 'Ok'})
         else:
@@ -446,10 +558,8 @@ class MakeOrderAPI(APIView):
                             best_items.append(item)
 
                 for best in best_items:
-                    print(best)
-                    print(best.selected)
                     best.select()
-                    print(best.selected)
+
 
             order.set_stage(3)
 

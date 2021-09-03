@@ -161,3 +161,22 @@ LOGIN_REDIRECT_URL = '/pilaru/items/search/'
 AUTH_USER_MODEL = 'accounts.User'
 
 PAGE_TITLE_PREFIX = 'Pila.Ru - '
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_HOST = 'smtp.mail.ru'
+EMAIL_PORT = 2525
+# EMAIL_HOST_USER = "user_test_4@mail.ru"
+# EMAIL_HOST_PASSWORD = "test_user"
+EMAIL_HOST_USER = "b1fenbecker@mail.ru"
+EMAIL_HOST_PASSWORD = "Hjvf221201"
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+SERVER_EMAIL = EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_HOST = 'smtp.yandex.ru'
+# EMAIL_PORT = 465
+

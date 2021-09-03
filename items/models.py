@@ -21,6 +21,20 @@ UNIT_MEASUREMENT_CHOICES = (
     (13, 'Бух'),
 )
 
+class SupplierContact(models.Model):
+    supplier = models.ForeignKey('Supplier', on_delete=models.CASCADE, related_name='contacts', verbose_name='Поставщик')
+    email = models.EmailField(verbose_name='Почта', default=None)
+    phone = models.CharField(max_length=30, verbose_name='Телефон', default=None, null=True)
+    is_selected = models.BooleanField(default=False, verbose_name='Выбран')
+    selected_method = models.CharField(max_length=128, verbose_name='Выбранный метод', default='')
+
+    def __str__(self):
+        return 'Контакт поставщика {0} - {1}'.format(self.supplier, self.email)
+
+    class Meta:
+        verbose_name = 'Контакт поставщика'
+        verbose_name_plural = 'Контакты поставщика'
+
 
 class Supplier(models.Model):
     name = models.CharField(max_length=200, verbose_name="Название")

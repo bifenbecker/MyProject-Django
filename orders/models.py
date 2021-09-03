@@ -164,7 +164,8 @@ class ItemToOrder(models.Model):
 class ProductToOrder(models.Model):
     product = models.ForeignKey('items.Product', on_delete=models.CASCADE, related_name="product_orders", verbose_name="Продукт")
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='products_in_order', verbose_name='Заказ', null=True, default=None)
-    stage = models.ForeignKey(Stage, on_delete=models.PROTECT, related_name='+', null=True, blank=True,
+    # TODO: Need to check default value
+    stage = models.ForeignKey(Stage, on_delete=models.PROTECT, related_name='+', default=Stage.objects.all().first().id, null=True, blank=True,
                               verbose_name='Этап')
     quantity = models.PositiveIntegerField(verbose_name='Количество', default=1)
     created_date = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")

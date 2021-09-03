@@ -1,152 +1,119 @@
+{% extends 'base_order.html' %}
 
-{% extends 'base.html' %}
 {% load get_item %}
 {% load index %}
+
 {% block custom_head %}
-
-    <!-- Custom styles for this page -->
-    <link href="/static/vendor/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
 <style>
-
-#show-graph:target {
-
-display: block;
-
-}
-
-
-#show-graph {
-
-background: rgba(102, 102, 102, 0.68);
-
-width: 100%;
-
-height: 100%;
-
-position: fixed;
-
-top: 0;
-
-left: 0;
-
-display: none;
-
-z-index: 9999999999;
-
-}
-
-window {
-
-position: absolute;
-
-top: 50%;
-
-left: 50%;
-
-width: 400px;
-
-border: 1px solid #cecece;
-
-padding: 50px;
-
-transform: translate(-50%,-50%);
-
-background-color: #fafafa;
-
-}
-
-div#main_text a.close_window {
-
-position: absolute;
-
-right: 10px;
-
-top: 4px;
-
-border: none;
-
-}
-
-.dropdown-tr{
-    display: none;
-}
-
+    .disabledbutton {
+        pointer-events: none;
+        opacity: 0.4;
+    }
 </style>
 {% endblock %}
 
-{% block content %}
 
-    {% for active_order in active_orders %}
-    <div class="row justify-content-center">
-        <div class="col-10">
-            <h5>Позиции в заказе номер {{ active_order.id }}:</h5>
-            <h5>Заказ с проекта - {{ active_order.project.name }}</h5>
-            <div class="card shadow mb-4">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered w-100" id="dataTable" cellspacing="0">
-                            <thead>
-                            <tr>
-                                <th></th>
-                                <th>Номер</th>
-                                <th>Название</th>
-                                <th>Этап</th>
-                                <th>Поставщик</th>
-                                <th>Ед. измерения</th>
-                                <th>Кол-во</th>
-                                <th>Цена за единицу</th>
-                                <th>Сумма</th>
-                                <th>Последняя цена - Поставщик</th>
-                                <th>Выбрать аналог</th>
-                                <th></th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for item_to_order in active_order.items_in_order.all %}
-                                <tr id="{{ item_to_order.item.id }}_item">
-                                    <td>{{ item_to_order.item.id }}</td>
-                                    <td>{{ item_to_order.item.name }}</td>
-                                    <td><select name="select_stage" onchange="">
-                                        {% for stage in stages %}
-                                            {% if stage.id == item_to_order.stage.id %}
-                                            <option value="{{ stage.name }}_{{ stage.id }}" id="{{ item_to_order.id }}" selected>{{ stage.name }}</option>
-                                            {% else %}
-                                            <option value="{{ stage.name }}_{{ stage.id }}" id="{{ item_to_order.id }}">{{ stage.name }}</option>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </select></td>
-                                    <td>{{ item_to_order.item.supplier.name }}</td>
-                                    <td>{{ item_to_order.item.get_unit_measurement_display }}</td>
-                                    <td><input class="form-control" type="number" name="item_qty" min="1" step="1" value="{{ item_to_order.quantity }}" onchange="api_change_item_qty_in_order(this, {{ item_to_order.id }})"></td>
-                                    <td><span>{% if item_to_order.price_offer %}{{ item_to_order.price_offer.price_per_unit|floatformat:2 }}{% else %}-{% endif %}</span><span style="float: right"><button onclick="showGraph({{ item_to_order.item.id }})" class="btn btn-primary">График</button></span></td>
-                                    <td>{% if item_to_order.get_total_price %}{{ item_to_order.get_total_price|floatformat:2 }}{% else %}-{% endif %}</td>
-                                    <td>{{ last_price|get_item:active_order.id|get_item:item_to_order.id|index:0 }} - {{ last_price|get_item:active_order.id|get_item:item_to_order.id|index:1 }}</td>
-                                    <td>
-                                        <button class="btn btn-secondary" name="btn-choose-similar" id="showAnalogs" data-item-to-order-id="{{ item_to_order.id }}" data-item-id="{{ item_to_order.item.id }}">Выбрать аналог</button>
-                                    </td>
-                                    <td>
-                                        <button class="btn p-0" onclick="api_remove_item_from_order({{ item_to_order.id }})"><i class="fas fa-trash-alt fa-lg"></i></button>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <a href="{% url 'search_url' %}" class="btn btn-outline-secondary float-right" onclick="api_close_order({{ active_order.id }})">Закрыть заказ</a>
-            <a href="{% url 'supplier_table_url' order_id=active_order.id %}" class="btn btn-outline-secondary float-right">Смета поставщиков</a>
-        </div>
-    </div>
-    {% endfor %}
-    <div id="show-graph">
-        <window>
-           <a href="#close_window" class="close_window">X</a>
-           
-            <canvas id="chart" width="500" height="500"></canvas>
-        </window>
-    </div>
-{% endblock %}
+    {% block price_stage_1 %}
+        <td>{% if item_to_order.get_total_price %}{{ item_to_order.get_total_price|floatformat:2 }}{% else %}-{% endif %}</td>
+    {% endblock %}
+
+    {% block last_price_stage_1 %}
+        {% if last_price|get_item:order.id|get_item:item_to_order.id %}
+        <td>{{ last_price|get_item:order.id|get_item:item_to_order.id }}</td>
+        {% else %}
+        <td>У Вас пока нет истории заказов :(</td>
+        {% endif %}
+    {% endblock %}
+
+
+    {% block price_stage_2 %}
+        <td>
+            {% if item_to_order.get_total_price %}{{ item_to_order.get_total_price|floatformat:2 }}{% else %}-{% endif %}
+            {% if last_price|get_item:order.id|get_item:item_to_order.id %}
+                {% if last_price|get_item:order.id|get_item:item_to_order.id > item_to_order.get_total_price %}
+                    <i class="fa fa-arrow-down"></i>
+                {% elif last_price|get_item:order.id|get_item:item_to_order.id < item_to_order.get_total_price %}
+                    <i class="fa fa-arrow-up"></i>
+                {% else %}
+
+                {% endif %}
+            {% endif %}
+        </td>
+    {% endblock %}
+
+    {% block last_price_stage_2 %}
+        {% if last_price|get_item:order.id|get_item:item_to_order.id %}
+        <td>{{ last_price|get_item:order.id|get_item:item_to_order.id }}</td>
+        {% else %}
+        <td>У Вас пока нет истории заказов :(</td>
+        {% endif %}
+    {% endblock %}
+
+    {% block price_stage_3 %}
+        <td>
+            {% if item_to_order.get_total_price %}{{ item_to_order.get_total_price|floatformat:2 }}{% else %}-{% endif %}
+            {% if last_price|get_item:order.id|get_item:item_to_order.id %}
+                {% if last_price|get_item:order.id|get_item:item_to_order.id > item_to_order.get_total_price %}
+                    <i class="fa fa-arrow-down"></i>
+                {% elif last_price|get_item:order.id|get_item:item_to_order.id < item_to_order.get_total_price %}
+                    <i class="fa fa-arrow-up"></i>
+                {% else %}
+
+                {% endif %}
+            {% endif %}
+        </td>
+    {% endblock %}
+
+    {% block last_price_stage_3 %}
+        {% if last_price|get_item:order.id|get_item:item_to_order.id %}
+        <td>{{ last_price|get_item:order.id|get_item:item_to_order.id }}</td>
+        {% else %}
+        <td>У Вас пока нет истории заказов :(</td>
+        {% endif %}
+    {% endblock %}
+
+    {% block price_stage_4 %}
+        <td>
+            {% if item_to_order.get_total_price %}{{ item_to_order.get_total_price|floatformat:2 }}{% else %}-{% endif %}
+            {% if last_price|get_item:order.id|get_item:item_to_order.id %}
+                {% if last_price|get_item:order.id|get_item:item_to_order.id > item_to_order.get_total_price %}
+                    <i class="fa fa-arrow-down"></i>
+                {% elif last_price|get_item:order.id|get_item:item_to_order.id < item_to_order.get_total_price %}
+                    <i class="fa fa-arrow-up"></i>
+                {% else %}
+
+                {% endif %}
+            {% endif %}
+        </td>
+    {% endblock %}
+
+    {% block last_price_stage_4 %}
+        {% if last_price|get_item:order.id|get_item:item_to_order.id %}
+        <td>{{ last_price|get_item:order.id|get_item:item_to_order.id }}</td>
+        {% else %}
+        <td>У Вас пока нет истории заказов :(</td>
+        {% endif %}
+    {% endblock %}
+
+
+    {% block buttons %}
+    {% if order.order_stage == 1 %}
+        <a href="#" class="btn btn-outline-secondary float-right" name="send-message-to-suppliers" data-item-id="{{ order.id }}">Запросить цену</a>
+    {% elif order.order_stage == 2 %}
+            {% if order.is_answer_all_suppliers %}
+            <a href="#" class="btn btn-outline-secondary float-right" name="make-order" data-item-id="{{ order.id }}">Оформить заказ</a>
+            {% else %}
+            <a href="#" class="btn btn-outline-secondary float-right" name="-" data-item-id="{{ order.id }}">Оформить заказ</a>
+            {% endif %}
+    {% elif order.order_stage == 3 %}
+        <a href="#" class="btn btn-outline-secondary float-right" name="-" data-item-id="{{ order.id }}">Подтвердить выбранные товары</a>
+    {% elif order.order_stage == 4 %}
+        <a href="#" class="btn btn-outline-secondary float-right" name="-" data-item-id="{{ order.id }}">Заказать</a>
+    {% endif %}
+
+    <a href="#" class="btn btn-outline-danger float-right mr-2" name="close-order" data-item-id="{{ order.id }}">Закрыть заказ</a>
+    {% endblock %}
+
 
 {% block custom_script %}
 
@@ -156,7 +123,6 @@ border: none;
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4"></script>
     <script src="/static/js/pilaru.js"></script>
     <script>
-
 
         function setGraph(obj){
             const data = {
