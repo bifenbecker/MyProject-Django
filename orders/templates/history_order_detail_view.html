@@ -3,7 +3,21 @@
 {% load get_item %}
 {% load index %}
 
+    {% block price_stage_1 %}
+        <td>-</td>
+    {% endblock %}
 
+    {% block price_stage_2 %}
+        <td>{{ item_to_order.get_total_price|floatformat:2 }}</td>
+    {% endblock %}
+
+    {% block price_stage_3 %}
+        <td>{{ item_to_order.get_total_price|floatformat:2 }}</td>
+    {% endblock %}
+
+    {% block price_stage_4 %}
+        <td>{{ item_to_order.get_total_price|floatformat:2 }}</td>
+    {% endblock %}
 
 {% block custom_script %}
 
