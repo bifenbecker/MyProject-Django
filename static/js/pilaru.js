@@ -315,13 +315,9 @@ $(document).on('click', 'a[name="send-message-to-suppliers"]', function () {
         },
         dataType: 'jsonp',
         success: function (data) {
-            console.log(1);
-            console.log(data);
             document.location.reload();
         },
         error: function (e) {
-            console.log(2);
-            console.log(e);
             alert('Ошибка запроса к серверу: ' + e['error']);
         }
     });

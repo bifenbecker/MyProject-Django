@@ -144,9 +144,9 @@ class FormingOrderView(View):
             for order in active_orders_by_projects:
                 last_price_orders.update({order.id: get_last_price_by_order(request.user, order)})
 
+        print(last_price_orders)
         if len(active_orders_by_projects) != 0:
             context['orders'] = active_orders_by_projects
-            # context['active_orders'] = active_orders_by_projects
             context['last_price'] = last_price_orders
             context['stages'] = Stage.objects.all()
             return render(request, self.template_name, context=context)
@@ -188,7 +188,7 @@ class HistoryOrderDetailView(View):
                 'page_title': settings.PAGE_TITLE_PREFIX + 'Заказ: ' + str(order.id),
                 'toolbar_title': 'Заказ: ' + str(order.id) + ' От ' + str(order.created_date).split(".")[0] + " (" + state_order + ")"
             }
-            context['orders'] = [order]
+            context['order'] = order
             return render(request, self.template_name, context=context)
 
 # endregion

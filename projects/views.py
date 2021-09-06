@@ -65,7 +65,7 @@ class ProjectDetailView(View):
             'toolbar_title': project.name,
             'project': project,
             'creator': creator,
-            'last_price': get_last_price_by_order(request.user, project.get_active_order()) if project.get_active_order() else None,
+            'last_price': { project.get_active_order().id if project.get_active_order() else None: get_last_price_by_order(request.user, project.get_active_order()) if project.get_active_order() else None},
             'stages': Stage.objects.all(),
         }
         return render(request, self.template_name, context=context)

@@ -1,7 +1,9 @@
-{% extends 'base_order.html' %}
+{% extends 'base.html' %}
 
 {% load get_item %}
 {% load index %}
+{% block content %}
+    {% include "base_order_2.html" with order=order %}
 
     {% block price_stage_1 %}
         <td>-</td>
@@ -18,7 +20,7 @@
     {% block price_stage_4 %}
         <td>{{ item_to_order.get_total_price|floatformat:2 }}</td>
     {% endblock %}
-
+{% endblock %}
 {% block custom_script %}
 
     <!-- Page level plugins -->

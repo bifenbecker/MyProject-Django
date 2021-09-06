@@ -1,4 +1,4 @@
-{% extends 'base_order.html' %}
+{% extends 'base.html' %}
 
 {% load get_item %}
 {% load index %}
@@ -12,108 +12,13 @@
 </style>
 {% endblock %}
 
+{% block content %}
 
-    {% block price_stage_1 %}
-        <td>{% if item_to_order.get_total_price %}{{ item_to_order.get_total_price|floatformat:2 }}{% else %}-{% endif %}</td>
-    {% endblock %}
+    {% for order in orders %}
+    {% include "base_order_2.html" with order=order %}
+    {% endfor %}
 
-    {% block last_price_stage_1 %}
-        {% if last_price|get_item:order.id|get_item:item_to_order.id %}
-        <td>{{ last_price|get_item:order.id|get_item:item_to_order.id }}</td>
-        {% else %}
-        <td>У Вас пока нет истории заказов :(</td>
-        {% endif %}
-    {% endblock %}
-
-
-    {% block price_stage_2 %}
-        <td>
-            {% if item_to_order.get_total_price %}{{ item_to_order.get_total_price|floatformat:2 }}{% else %}-{% endif %}
-            {% if last_price|get_item:order.id|get_item:item_to_order.id %}
-                {% if last_price|get_item:order.id|get_item:item_to_order.id > item_to_order.get_total_price %}
-                    <i class="fa fa-arrow-down"></i>
-                {% elif last_price|get_item:order.id|get_item:item_to_order.id < item_to_order.get_total_price %}
-                    <i class="fa fa-arrow-up"></i>
-                {% else %}
-
-                {% endif %}
-            {% endif %}
-        </td>
-    {% endblock %}
-
-    {% block last_price_stage_2 %}
-        {% if last_price|get_item:order.id|get_item:item_to_order.id %}
-        <td>{{ last_price|get_item:order.id|get_item:item_to_order.id }}</td>
-        {% else %}
-        <td>У Вас пока нет истории заказов :(</td>
-        {% endif %}
-    {% endblock %}
-
-    {% block price_stage_3 %}
-        <td>
-            {% if item_to_order.get_total_price %}{{ item_to_order.get_total_price|floatformat:2 }}{% else %}-{% endif %}
-            {% if last_price|get_item:order.id|get_item:item_to_order.id %}
-                {% if last_price|get_item:order.id|get_item:item_to_order.id > item_to_order.get_total_price %}
-                    <i class="fa fa-arrow-down"></i>
-                {% elif last_price|get_item:order.id|get_item:item_to_order.id < item_to_order.get_total_price %}
-                    <i class="fa fa-arrow-up"></i>
-                {% else %}
-
-                {% endif %}
-            {% endif %}
-        </td>
-    {% endblock %}
-
-    {% block last_price_stage_3 %}
-        {% if last_price|get_item:order.id|get_item:item_to_order.id %}
-        <td>{{ last_price|get_item:order.id|get_item:item_to_order.id }}</td>
-        {% else %}
-        <td>У Вас пока нет истории заказов :(</td>
-        {% endif %}
-    {% endblock %}
-
-    {% block price_stage_4 %}
-        <td>
-            {% if item_to_order.get_total_price %}{{ item_to_order.get_total_price|floatformat:2 }}{% else %}-{% endif %}
-            {% if last_price|get_item:order.id|get_item:item_to_order.id %}
-                {% if last_price|get_item:order.id|get_item:item_to_order.id > item_to_order.get_total_price %}
-                    <i class="fa fa-arrow-down"></i>
-                {% elif last_price|get_item:order.id|get_item:item_to_order.id < item_to_order.get_total_price %}
-                    <i class="fa fa-arrow-up"></i>
-                {% else %}
-
-                {% endif %}
-            {% endif %}
-        </td>
-    {% endblock %}
-
-    {% block last_price_stage_4 %}
-        {% if last_price|get_item:order.id|get_item:item_to_order.id %}
-        <td>{{ last_price|get_item:order.id|get_item:item_to_order.id }}</td>
-        {% else %}
-        <td>У Вас пока нет истории заказов :(</td>
-        {% endif %}
-    {% endblock %}
-
-
-    {% block buttons %}
-    {% if order.order_stage == 1 %}
-        <a href="#" class="btn btn-outline-secondary float-right" name="send-message-to-suppliers" data-item-id="{{ order.id }}">Запросить цену</a>
-    {% elif order.order_stage == 2 %}
-            {% if order.is_answer_all_suppliers %}
-            <a href="#" class="btn btn-outline-secondary float-right" name="make-order" data-item-id="{{ order.id }}">Оформить заказ</a>
-            {% else %}
-            <a href="#" class="btn btn-outline-secondary float-right" name="-" data-item-id="{{ order.id }}">Оформить заказ</a>
-            {% endif %}
-    {% elif order.order_stage == 3 %}
-        <a href="#" class="btn btn-outline-secondary float-right" name="-" data-item-id="{{ order.id }}">Подтвердить выбранные товары</a>
-    {% elif order.order_stage == 4 %}
-        <a href="#" class="btn btn-outline-secondary float-right" name="-" data-item-id="{{ order.id }}">Заказать</a>
-    {% endif %}
-
-    <a href="#" class="btn btn-outline-danger float-right mr-2" name="close-order" data-item-id="{{ order.id }}">Закрыть заказ</a>
-    {% endblock %}
-
+{% endblock %}
 
 {% block custom_script %}
 
