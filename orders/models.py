@@ -143,20 +143,6 @@ class ItemToOrder(models.Model):
         else:
             return None
 
-    def get_last_price(self, user):
-        orders = user.orders.all().order_by('-created_date').exclude(order_stage=1)
-        if len(orders) == 0:
-            return "У Вас пока нет истории заказов :("
-
-        for order in orders:
-            if not order.is_active():
-                for item_in_order in order.items_in_order.all():
-                    if item_in_order.item.supplier.name == self.item.supplier.name and item_in_order.item.name == self.item.name:
-                        return float(item_in_order.price_offer.price_per_unit)
-
-        return "Такого товара не было ранее"
-
-
     def set_stage(self, stage: Stage):
         self.stage = stage
         self.save()

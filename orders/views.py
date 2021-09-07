@@ -28,62 +28,6 @@ import random
 from decimal import Decimal
 
 
-
-def get_history_order(user):
-    try:
-        history_order = []
-        for order in user.orders.all():
-            if not order.is_active():
-                history_order.append(order)
-
-        if len(history_order) == 0:
-            raise ObjectDoesNotExist("У Вас пока нет истории заказов :(")
-        else:
-            return history_order
-    except ObjectDoesNotExist:
-        raise ObjectDoesNotExist("У Вас пока нет истории заказов :(")
-
-
-def find_last_item_price_from_supplier_in_orders(item: Item, orders: list):
-    for order in orders:
-        for item_in_order in order.items_in_order.all():
-            if item_in_order.item.supplier.name == item.supplier.name and item_in_order.item.name == item.name:
-                return float(item_in_order.price_offer.price_per_unit)
-
-    return "Такого товара не было ранее"
-
-
-def get_last_price_by_order(user, order):
-    last_price = {}
-
-    try:
-        history_order_by_user = get_history_order(user)
-        if len(order.items_in_order.all()) != 0:
-            for item_in_active_order in order.items_in_order.all():
-                last_price[item_in_active_order.id] = find_last_item_price_from_supplier_in_orders(
-                    item_in_active_order.item,
-                    history_order_by_user)
-        else:
-            for product in order.products_in_order.all():
-                for item_in_product in product.product.items.all():
-                    last_price[item_in_product.id] = find_last_item_price_from_supplier_in_orders(
-                        item_in_product,
-                        history_order_by_user)
-
-    except Exception as e:
-        # TODO: Need to check
-        # for item_in_active_order in order.items_in_order.all():
-        #     last_price[item_in_active_order.id] = (str(e), '')
-        # for product_in_order in order.products_in_order.all():
-        #     for item in product_in_order.product.items.all():
-        #         last_price[item.id] = (str(e), '')
-        for product_in_order in order.products_in_order.all():
-            for item in product_in_order.product.items.all():
-                last_price[item.id] = str(e)
-
-    return last_price if last_price else None
-
-
 def is_auth(func):
     """Check is authenticated user"""
 
@@ -138,17 +82,8 @@ class FormingOrderView(View):
             if member.project.get_active_order():
                 active_orders_by_projects.append(member.project.get_active_order())
 
-        last_price_orders = {}
-        if len(active_orders_by_projects) != 0:
-            for order in active_orders_by_projects:
-                for item_in_order in order.items_in_order.all():
-                    # if order.order_stage != 1:
-                    #     print(item_in_order.get_last_price(request.user))
-                    last_price_orders.update({order.id: get_last_price_by_order(request.user, order)})
-
         if len(active_orders_by_projects) != 0:
             context['orders'] = active_orders_by_projects
-            context['last_price'] = last_price_orders
             context['stages'] = Stage.objects.all()
             return render(request, self.template_name, context=context)
         else:
