@@ -126,7 +126,6 @@ class OrderView(View):
 
 class FormingOrderView(View):
     template_name = "order_view.html"
-    # template_name = "forming_order.html"
 
     @is_auth
     def get(self, request):
@@ -142,9 +141,11 @@ class FormingOrderView(View):
         last_price_orders = {}
         if len(active_orders_by_projects) != 0:
             for order in active_orders_by_projects:
-                last_price_orders.update({order.id: get_last_price_by_order(request.user, order)})
+                for item_in_order in order.items_in_order.all():
+                    # if order.order_stage != 1:
+                    #     print(item_in_order.get_last_price(request.user))
+                    last_price_orders.update({order.id: get_last_price_by_order(request.user, order)})
 
-        print(last_price_orders)
         if len(active_orders_by_projects) != 0:
             context['orders'] = active_orders_by_projects
             context['last_price'] = last_price_orders

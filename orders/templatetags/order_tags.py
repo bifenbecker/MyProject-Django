@@ -12,8 +12,12 @@ def get_item(dictionary, key):
 
 @register.filter
 def index(iter, index):
-    print(iter, index)
     if iter:
         return iter[index]
     else:
         return "-1"
+
+def get_last_price(item, user):
+    return "-1"
+
+register.filter('get_last_price', get_last_price)
