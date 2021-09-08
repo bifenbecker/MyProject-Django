@@ -15,8 +15,6 @@ function getCookie(name) {
     return cookieValue;
 }
 
-
-const csrftoken = getCookie('csrftoken');
 const API_URL_PREFIX = '/pilaru';
 
 
@@ -31,7 +29,7 @@ const API_URL_PREFIX = '/pilaru';
 //         type: 'post',
 //         data: { 'item_id': item_id, 'quantity': qty },
 //         headers: {
-//             'X-CSRFToken': csrftoken,
+//             'X-CSRFToken': getCookie('csrftoken'),
 //         },
 //         dataType: 'json',
 //         success: function (data) {
@@ -61,7 +59,7 @@ $(document).on('click', 'button[name="add-product-to-order"]', function (){
         type: 'post',
         data: { 'product_id': product_id },
         headers: {
-            'X-CSRFToken': csrftoken,
+            'X-CSRFToken': getCookie('csrftoken'),
         },
         dataType: 'json',
         success: function (data) {
@@ -92,7 +90,7 @@ function api_add_product_to_order(product_id) {
         type: 'post',
         data: { 'product_id': product_id },
         headers: {
-            'X-CSRFToken': csrftoken,
+            'X-CSRFToken': getCookie('csrftoken'),
         },
         dataType: 'json',
         success: function (data) {
@@ -120,7 +118,7 @@ function api_remove_item_from_order(item_to_order_id) {
         type: 'post',
         data: { 'item_to_order_id': item_to_order_id },
         headers: {
-            'X-CSRFToken': csrftoken,
+            'X-CSRFToken': getCookie('csrftoken'),
         },
         dataType: 'json',
         success: function (data) {
@@ -139,7 +137,7 @@ function api_remove_product_from_order(product_to_order_id) {
         type: 'post',
         data: { 'product_to_order_id': product_to_order_id },
         headers: {
-            'X-CSRFToken': csrftoken,
+            'X-CSRFToken': getCookie('csrftoken'),
         },
         dataType: 'json',
         success: function (data) {
@@ -159,7 +157,7 @@ function api_change_item_qty_in_order(input, item_to_order_id) {
         type: 'post',
         data: { 'item_to_order_id': item_to_order_id, 'quantity': quantity },
         headers: {
-            'X-CSRFToken': csrftoken,
+            'X-CSRFToken': getCookie('csrftoken'),
         },
         dataType: 'json',
         success: function (data) { },
@@ -176,7 +174,7 @@ function api_close_order(order_id) {
         type: 'post',
         data: { 'order_id': order_id },
         headers: {
-            'X-CSRFToken': csrftoken,
+            'X-CSRFToken': getCookie('csrftoken'),
         },
         dataType: 'json',
         success: function (data) { },
@@ -213,7 +211,7 @@ $(document.body).on("change", 'select[name="select_stage"]', function(){
         type: 'post',
         data: { 'product_stage_id': product_stage_id, 'product_to_order_id': product_to_order_id },
         headers: {
-            'X-CSRFToken': csrftoken,
+            'X-CSRFToken': getCookie('csrftoken'),
         },
         dataType: 'json',
         success: function (data) { 
@@ -259,7 +257,7 @@ $(document).on('click', 'button[name="btn-choose-similar"]', function () {
             type: 'get',
             data: { 'item_to_order_item_id': item_to_order_item_id },
             headers: {
-                'X-CSRFToken': csrftoken,
+                'X-CSRFToken': getCookie('csrftoken'),
             },
             dataType: 'json',
             success: function (data) {
@@ -284,7 +282,7 @@ $(document).on('change', 'input[name="select-item"]', function () {
         type: 'post',
         data: { 'item_to_order_id': item_to_order_id , 'is_checked': +is_checked },
         headers: {
-            'X-CSRFToken': csrftoken,
+            'X-CSRFToken': getCookie('csrftoken'),
         },
         dataType: 'json',
         success: function (data) {
@@ -311,7 +309,7 @@ $(document).on('click', 'a[name="send-message-to-suppliers"]', function () {
         type: 'post',
         data: { 'order_id': order_id , 'qtn_data': JSON.stringify(qtn_data) },
         headers: {
-            'X-CSRFToken': csrftoken,
+            'X-CSRFToken': getCookie('csrftoken'),
         },
         dataType: 'jsonp',
         success: function (data) {
@@ -333,7 +331,7 @@ $('input[name="product_qty"]').change(function(){
         type: 'post',
         data: { 'product_to_order_id': product_id , 'quantity': quantity },
         headers: {
-            'X-CSRFToken': csrftoken,
+            'X-CSRFToken': getCookie('csrftoken'),
         },
         dataType: 'json',
         success: function (data) {
@@ -365,7 +363,7 @@ $('a[name="make-order"]').click(function(){
         type: 'post',
         data: { 'order_id': order_id  },
         headers: {
-            'X-CSRFToken': csrftoken,
+            'X-CSRFToken': getCookie('csrftoken'),
         },
         dataType: 'json',
         success: function (data) {
@@ -373,7 +371,7 @@ $('a[name="make-order"]').click(function(){
         },
         error: function (e) {
             alert('Ошибка запроса к серверу: ' + e['error']);
-        }
+        }s
     });
 });
 

@@ -50,7 +50,7 @@
             type: 'post',
             data: { 'product_stage_id': product_stage_id, 'item_to_order_id': item_to_order_id },
             headers: {
-                'X-CSRFToken': csrftoken,
+                'X-CSRFToken': getCookie('csrftoken'),
             },
             dataType: 'json',
             success: function (data) {

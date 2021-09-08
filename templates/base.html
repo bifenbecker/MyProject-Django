@@ -457,7 +457,7 @@
             type: 'post',
             data: { 'project_name': project_name, 'set_active_order_id': order_id },
             headers: {
-                'X-CSRFToken': csrftoken,
+                'X-CSRFToken': getCookie('csrftoken'),
             },
             dataType: 'json',
             success: function (data) { 

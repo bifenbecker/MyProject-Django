@@ -24,10 +24,10 @@
 {% block custom_script %}
 
     <!-- Page level plugins -->
-    <script src="/static/vendor/datatables/jquery.dataTables.min.js"></script>
-    <script src="/static/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+    <script src="{% static '/vendor/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static '/vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4"></script>
-    <script src="/static/js/pilaru.js"></script>
+
     <script>
 
         function setGraph(obj){
@@ -61,15 +61,13 @@
 
         function showGraph(item_id){
             location.hash ='show-graph'
-
-            const csrftoken = getCookie('csrftoken');
             
             $.ajax({
                 url: '/pilaru/orders/api/price_history',
                 type: 'post',
                 data: { 'item_id': item_id },
                 headers: {
-                    'X-CSRFToken': csrftoken,
+                    'X-CSRFToken': getCookie('csrftoken'),
                 },
                 dataType: 'json',
                 success: function (obj) {
