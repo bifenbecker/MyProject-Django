@@ -351,51 +351,6 @@ class SendMessageToSuppliers(APIView):
 
         order = Order.objects.get(id=order_id)
 
-        text = """
-        <html>
-            <head>
-                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-            </head>
-            <body>
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-            <div class="row justify-content-center">
-                <div class="col-10">
-                    <h5>Заказ с проекта - {0}</h5>
-                    <div class="card shadow mb-4">
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered w-100" cellspacing="0">
-                                            <thead>
-                                            <tr>
-                                                <th>Номер</th>
-                                                <th>Название</th>
-                                                <th>Этап</th>
-                                                <th>Единица измерения</th>
-                                                <th>Колчисетво</th>
-                                            </tr>
-                                            </thead>
-                                            <tbody>
-                                            {1}
-                                            </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            </body>
-        </html>
-        """
-        row_table = """
-            <tr>
-                <td>{0}</td>
-                <td>{1}</td>
-                <td>{2}</td>
-                <td>{3}</td>  
-                <td>{4}</td>                       
-            </tr>                       
-        """
-
         data_suppliers = {}
         if order.order_stage == 1:
             try:
@@ -428,43 +383,27 @@ class SendMessageToSuppliers(APIView):
                             print(str(e))
 
                 for supplier in data_suppliers:
-                    # TODO: Какой контакт использовать
                     supplier_contact = supplier.contacts.all().first()
-                    try:
-                        html_message = render_to_string('message_to_suppliers.html', context={'rows' : data_suppliers[supplier][0], 'stage': data_suppliers[supplier][1], 'project_name': order.project.name})
-                    except Exception as e:
-                        print(str(e))
-                    # msg = MIMEMultipart('alternative')
-                    # msg['Subject'] = "Запрос цены"
-                    # msg['From'] = settings.EMAIL_HOST_USER
-                    # msg['To'] = (supplier_contact.email)
-                    # text_message = strip_tags(html_message)
-                    # part1 = MIMEText(text_message, 'plain')
-                    # part2 = MIMEText(html_message, 'html')
-                    # msg.attach(part1)
-                    # msg.attach(part2)
-                    #
-                    # send_mail(
-                    #     'Запрос цены',
-                    #     msg.as_string(),
-                    #     settings.EMAIL_HOST_USER,
-                    #     [supplier_contact.email],
-                    #     fail_silently=False,
-                    # )
-                    plain_text = strip_tags(html_message)
-                    msg = EmailMultiAlternatives('Запрос цены', plain_text, settings.EMAIL_HOST_USER, [supplier_contact.email])
-                    msg.attach_alternative(html_message, "text/html")
-                    msg.send()
+                    if supplier_contact:
+                        try:
+                            html_message = render_to_string('message_to_suppliers.html', context={'rows' : data_suppliers[supplier][0], 'stage': data_suppliers[supplier][1], 'project_name': order.project.name})
+                        except Exception as e:
+                            print(str(e))
+
+                        plain_text = strip_tags(html_message)
+                        msg = EmailMultiAlternatives('Запрос цены', plain_text, settings.EMAIL_HOST_USER, [supplier_contact.email])
+                        msg.attach_alternative(html_message, "text/html")
+                        msg.send()
 
 
             except Exception as e:
                 print(str(e))
                 return Response({'error': "Не удалось отправить запрос"})
 
-            # try:
-            #     order.set_stage(2)
-            # except Exception as e:
-            #     raise Exception(str(e))
+            try:
+                order.set_stage(2)
+            except Exception as e:
+                raise Exception(str(e))
 
             return Response({'Result': 'Ok'})
         else:
