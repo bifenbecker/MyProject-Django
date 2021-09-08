@@ -3,7 +3,7 @@
 {% block custom_head %}
 
     <!-- Custom styles for this page -->
-    <link href="{% static '/static/vendor/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet">
+    <link href="{% static '/vendor/datatables/dataTables.bootstrap4.min.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
@@ -136,9 +136,9 @@
 {% block custom_script %}
 
     <!-- Page level plugins -->
-    <script src="/static/vendor/datatables/jquery.dataTables.min.js"></script>
-    <script src="/static/vendor/datatables/dataTables.bootstrap4.min.js"></script>
-    <script src="/static/js/pilaru.js"></script>
+    <script src="{% static '/vendor/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static '/vendor/datatables/dataTables.bootstrap4.min.js' %}"></script>
+
     <script>
         function getCookie(name) {
             let cookieValue = null;
@@ -156,8 +156,6 @@
             return cookieValue;
         }
 
-
-        const csrftoken = getCookie('csrftoken');
 
         $(document).ready(function() {
             $('#dataTable').DataTable({
@@ -177,7 +175,7 @@
                 type: 'post',
                 data: { 'product_id': product_id },
                 headers: {
-                    'X-CSRFToken': csrftoken,
+                    'X-CSRFToken': getCookie('csrftoken'),
                 },
                 dataType: 'json',
                 success: function (data) {
